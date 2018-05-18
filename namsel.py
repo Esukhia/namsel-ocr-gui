@@ -60,6 +60,7 @@ class NamselOcr(QMainWindow):
         super(NamselOcr, self).__init__(*args, **kwargs)
 
         self.etat = 0
+        self.run_button_etat = False
         self.volume = False
         self.p_arg = p_arg
 
@@ -325,6 +326,7 @@ class NamselOcr(QMainWindow):
 
     def init(self):
         self.etat = 0
+        self.run_button_etat = False
         self.volume = False
         self.p_arg.clear()
         self.ppecha_button.setChecked(True)
@@ -373,6 +375,9 @@ class NamselOcr(QMainWindow):
             self.pscan_image_layer1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
             self.pscan_image_layer2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
             self.etat = "Scan"
+            if self.run_button_etat == True:
+                self.preprocessRun()
+                self.run_button_etat = False
 
     def openScanDirImage(self):
         self.scan_folder_name = QFileDialog.getExistingDirectory(self, "Open a directory containing the scan images of a volume...", "")
@@ -405,6 +410,7 @@ class NamselOcr(QMainWindow):
                 self.p_arg.append("1")
             docker.preprocess(self.p_arg)
         else:
+            self.run_button_etat = True
             self.openScanImage()
 
     def preprocess_finished(self):
