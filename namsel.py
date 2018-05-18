@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from shutil import copyfile, rmtree
+from shutil import copy, rmtree
 from tempfile import gettempdir
 import os, sys
 
@@ -32,7 +32,7 @@ class Docker(object):
                                   +namsel_ocr_image+" bash")
         self.docker_process.waitForFinished()
         self.docker_process.close()
-        print("\nThe container Namsel Ocr is now running!\n")
+        print("\nDocker Namsel Ocr is now running!\n")
 
     def preprocess(self, arg=[]):
         arg = " ".join(arg)
@@ -60,6 +60,7 @@ class NamselOcr(QMainWindow):
         super(NamselOcr, self).__init__(*args, **kwargs)
 
         self.etat = 0
+        self.volume = False
         self.p_arg = p_arg
 
         # Title
@@ -273,11 +274,19 @@ class NamselOcr(QMainWindow):
         # Waiting progress dialog
         self.progress = QProgressDialog(None, Qt.WindowTitleHint)
         self.progress.setWindowFlags(self.progress.windowFlags() & ~Qt.WindowCloseButtonHint)
+        self.progress.setWindowTitle("Docker process")
         self.progress.setCancelButton(None)
         self.progress.setWindowModality(Qt.ApplicationModal)
-        self.progress.setLabelText("Processing...")
+        self.progress.setLabelText("Preprocess is running...")
         self.progress.setRange(0, 0)
         self.progress.cancel()
+
+        # Volume dialog
+        self.pvolume_dialogbuttonbox = QDialogButtonBox(QDialogButtonBox.Yes | QDialogButtonBox.No)
+        self.pvolume_dialogbuttonbox.setWindowTitle("Preprocess all the volume images?")
+        self.pvolume_dialogbuttonbox.setFixedSize(self.x_wsize / 2, self.y_wsize / 6)
+        self.pvolume_dialogbuttonbox.setCenterButtons(True)
+        self.pvolume_dialogbuttonbox.setWindowModality(Qt.ApplicationModal)
 
                         # Links between signals and slots
         self.pslider.valueChanged.connect(self.plcd.display)
@@ -285,14 +294,19 @@ class NamselOcr(QMainWindow):
         self.pdouble_page.toggled.connect(self.pdouble)
         self.open_file_subaction.triggered.connect(self.openScanImage)
         self.open_dir_subaction.triggered.connect(self.openScanDirImage)
+        self.pvolume_dialogbuttonbox.accepted.connect(lambda: self.preprocessRun(True))
+        self.pvolume_dialogbuttonbox.rejected.connect(self.preprocessRun)
         self.prun_button.released.connect(self.preprocessRun)
 
         self.new_subaction.triggered.connect(self.init)
         self.exit_subaction.triggered.connect(self.close)
-        #self.help_subaction.triggered.connect(self.wait)
+        #self.help_subaction.triggered.connect(self.test)
         #self.about_subaction.triggered.connect(self.ready)
 
         docker.docker_preprocess.finished.connect(self.preprocess_finished)
+
+    def test(self, x):
+        pass
 
     def pbook(self, x):
         if x:
@@ -311,6 +325,7 @@ class NamselOcr(QMainWindow):
 
     def init(self):
         self.etat = 0
+        self.volume = False
         self.p_arg.clear()
         self.ppecha_button.setChecked(True)
         self.pslider.setValue(0)
@@ -362,22 +377,38 @@ class NamselOcr(QMainWindow):
     def openScanDirImage(self):
         self.scan_folder_name = QFileDialog.getExistingDirectory(self, "Open a directory containing the scan images of a volume...", "")
         if self.scan_folder_name:
+            self.volume = True
             self.openScanImage(self.scan_folder_name)
 
-    def preprocessRun(self):
+    def preprocessRun(self, all=""):
         if self.etat == "Scan":
-            self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
-            copyfile(self.scan_image_name, self.scan_image_filename)
+            if self.volume:
+                self.volume = False
+                self.pvolume_dialogbuttonbox.show()
+                return
+            elif self.pvolume_dialogbuttonbox.isVisible():
+                self.pvolume_dialogbuttonbox.hide()
+
+            self.wait()
+
+            if not all:
+                copy(self.scan_image_name, work_directory)
+            else:
+                for f in os.listdir(self.scan_folder_name):
+                    if f.endswith(".tif"):
+                        while True:
+                            ack = copy(self.scan_folder_name+"/"+f, work_directory)
+                            if ack.find(f): break
 
             self.p_arg.append(str(self.pslider.value()))
             if self.pdouble_page.isChecked():
                 self.p_arg.append("1")
-            self.wait()
             docker.preprocess(self.p_arg)
         else:
             self.openScanImage()
 
     def preprocess_finished(self):
+        self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
         if os.path.isdir("./out") and os.path.isfile("./" + self.scan_image_filename):
             os.chdir("./out")
             self.primage = QPixmap(self.scan_image_filename)
