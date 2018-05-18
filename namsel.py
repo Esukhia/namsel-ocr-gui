@@ -222,23 +222,47 @@ class NamselOcr(QMainWindow):
         self.option_widget.setFixedHeight(100)
         self.option_widget.setLayout(self.option_layout)
 
-                # Scan image widget
-        #self.psimage = QPixmap("002.tif")
-        self.pscan_image = QLabel()
-        self.pscan_image.setStatusTip("The scan image")
-        #self.pscan_image.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+                # Image
+                    # Scan image widget
+        self.pscan_image_layer1 = QLabel()
+        self.pscan_image_layer2 = QLabel()
+        self.pscan_image_layer1.setStatusTip("The scan image")
+        self.pscan_image_layer2.setStatusTip("The scan image")
 
-                # Result image widget
-        #self.primage = QPixmap("002.tif")
-        self.presult_image = QLabel()
-        self.presult_image.setStatusTip("The result 'scantailored' image")
-        #self.presult_image.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+                    # Result image widget
+        self.presult_image_layer1 = QLabel()
+        self.presult_image_layer2 = QLabel()
+        self.presult_image_layer1.setStatusTip("The result 'scantailored' image")
+        self.presult_image_layer2.setStatusTip("The result 'scantailored' image")
+
+                # Image layout
+        self.image_hlayout = QHBoxLayout()
+        self.image_vlayout = QVBoxLayout()
+
+        self.image_vlayout.addWidget(self.pscan_image_layer1)
+        self.image_vlayout.addWidget(self.presult_image_layer1)
+
+        self.image_hlayout.addWidget(self.pscan_image_layer2)
+        self.image_hlayout.addWidget(self.presult_image_layer2)
+
+        self.image_widget = QWidget()
+        self.image_vwidget = QWidget()
+        self.image_hwidget = QWidget()
+
+        self.image_vwidget.setLayout(self.image_vlayout)
+        self.image_hwidget.setLayout(self.image_hlayout)
+
+        self.image_staklayout = QStackedLayout(self.image_widget)
+        self.image_staklayout.addWidget(self.image_vwidget)
+        self.image_staklayout.addWidget(self.image_hwidget)
+        self.image_staklayout.setCurrentWidget(self.image_vwidget)
+
+        self.image_widget.setLayout(self.image_staklayout)
 
             # Page widget
         self.prep_layout = QVBoxLayout()
         self.prep_layout.addWidget(self.option_widget)
-        self.prep_layout.addWidget(self.pscan_image)
-        self.prep_layout.addWidget(self.presult_image)
+        self.prep_layout.addWidget(self.image_widget)
 
         self.page_widget = QWidget()
         self.page_widget.setLayout(self.prep_layout)
@@ -257,7 +281,8 @@ class NamselOcr(QMainWindow):
 
                         # Links between signals and slots
         self.pslider.valueChanged.connect(self.plcd.display)
-        self.pbook_button.toggled.connect(lambda x: self.pdouble_page.show() if x else self.pdouble_page.hide())
+        self.pbook_button.toggled.connect(self.pbook)
+        self.pdouble_page.toggled.connect(self.pdouble)
         self.open_file_subaction.triggered.connect(self.openScanImage)
         self.open_dir_subaction.triggered.connect(self.openScanDirImage)
         self.prun_button.released.connect(self.preprocessRun)
@@ -269,6 +294,21 @@ class NamselOcr(QMainWindow):
 
         docker.docker_preprocess.finished.connect(self.preprocess_finished)
 
+    def pbook(self, x):
+        if x:
+            if not self.pdouble_page.isChecked():
+                self.image_staklayout.setCurrentWidget(self.image_hwidget)
+            self.pdouble_page.show()
+        else:
+            self.image_staklayout.setCurrentWidget(self.image_vwidget)
+            self.pdouble_page.hide()
+
+    def pdouble(self, x):
+        if x:
+            self.image_staklayout.setCurrentWidget(self.image_vwidget)
+        else:
+            self.image_staklayout.setCurrentWidget(self.image_hwidget)
+
     def init(self):
         self.etat = 0
         self.p_arg.clear()
@@ -279,11 +319,13 @@ class NamselOcr(QMainWindow):
         try:
             if self.scan_image_name:
                 del self.scan_image_name
-                self.pscan_image.clear()
+                self.pscan_image_layer1.clear()
+                self.pscan_image_layer2.clear()
                 del self.psimage
             if self.scan_image_filename:
                 del self.scan_image_filename
-                self.presult_image.clear()
+                self.presult_image_layer1.clear()
+                self.presult_image_layer2.clear()
                 del self.primage
         except: pass
 
@@ -309,10 +351,12 @@ class NamselOcr(QMainWindow):
         self.scan_image_name, _ = QFileDialog.getOpenFileName(self, "Open the source scan image...", folder, "Image files (*.tif)")
         if self.scan_image_name:
             if self.etat == "Result":
-                self.presult_image.clear()
+                self.presult_image_layer1.clear()
+                self.presult_image_layer2.clear()
                 self.del_out_dir()
             self.psimage = QPixmap(self.scan_image_name)
-            self.pscan_image.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.pscan_image_layer1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.pscan_image_layer2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
             self.etat = "Scan"
 
     def openScanDirImage(self):
@@ -337,7 +381,8 @@ class NamselOcr(QMainWindow):
         if os.path.isdir("./out") and os.path.isfile("./" + self.scan_image_filename):
             os.chdir("./out")
             self.primage = QPixmap(self.scan_image_filename)
-            self.presult_image.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.presult_image_layer1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.presult_image_layer2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
             os.chdir(work_directory)
             self.del_files()
 
