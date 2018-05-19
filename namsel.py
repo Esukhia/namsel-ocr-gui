@@ -83,8 +83,8 @@ class NamselOcr(QMainWindow):
 
         # Size : 70 % of the screen
         self.dw = QDesktopWidget()
-        self.x_wsize = self.dw.width() * 0.5
-        self.y_wsize = self.dw.height() * 0.5
+        self.x_wsize = self.dw.width() * 0.7
+        self.y_wsize = self.dw.height() * 0.7
         self.setFixedSize(self.x_wsize, self.y_wsize)
 
         # Menu
@@ -439,7 +439,7 @@ class NamselOcr(QMainWindow):
             # Menu
         self.new_subaction.triggered.connect(self.init)
         self.exit_subaction.triggered.connect(self.close)
-        self.help_subaction.triggered.connect(self.test)
+        #self.help_subaction.triggered.connect(self.test)
         # self.about_subaction.triggered.connect(self.ready)
             # Preprocess
         self.pslider.valueChanged.connect(self.plcd.display)
@@ -459,9 +459,6 @@ class NamselOcr(QMainWindow):
                 # Docker
         docker.docker_preprocess.finished.connect(self.preprocessFinished)
         docker.docker_ocr.finished.connect(self.ocrFinished)
-
-    def test(self):
-        pass
 
     def pbook(self, x):
         if x:
