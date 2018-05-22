@@ -6,10 +6,23 @@ from shutil import copy, rmtree
 from tempfile import gettempdir
 import os, sys
 
+import gettext
+
+languages = {
+    "bo":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["bo"]),
+    "en":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["en"]),
+    "fr":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["fr"]),
+    "zh_CN":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["zhs"]),
+    "zh_TW":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["zht"]),
+}
+lang = languages["en"]
 work_directory = gettempdir() + "/namsel"
 
 def setEnvironment():
-    global work_directory, docker
+    global docker
+
+    for l in [l for i, l in languages.items() if l]:
+        l.install()
 
     if os.path.isdir(work_directory):
         rmtree(work_directory)
@@ -19,8 +32,6 @@ def setEnvironment():
     docker = Docker("thubtenrigzin/docker-namsel-ocr:latest", "namsel-ocr")
 
 class Docker(object):
-    global namsel_ocr, work_directory
-
     def __init__(self, namsel_ocr_image, namsel_ocr_container):
         self.docker_process = QProcess()
         self.docker_preprocess = QProcess()
@@ -33,36 +44,36 @@ class Docker(object):
                                   +namsel_ocr_image+" bash")
         self.docker_process.waitForFinished()
         self.docker_process.close()
-        print("\nDocker Namsel Ocr is now running!\n")
+        print(lang.gettext("\nDocker Namsel Ocr is now running!\n"))
 
     def preprocess(self, arg={}):
         arg = " "+" ".join(["--"+k+" "+str(v) for k, v in arg.items() if v])
-        print("\nPreprocess is running...")
+        print(lang.gettext("\nPreprocess is running..."))
         #print(arg)
         self.docker_preprocess.start("docker exec namsel-ocr ./namsel-ocr preprocess"+arg)
 
     def ocr(self, arg={}):
         arg = " "+" ".join(["--"+k+" "+str(v) for k, v in arg.items() if v])
-        print("\nOcr is running...")
+        print(lang.gettext("\nOcr is running..."))
         #print(arg)
         self.docker_ocr.start("docker exec namsel-ocr ./namsel-ocr recognize-volume --format text"+arg)
 
     def stop(self):
-        print("\nStopping the container...")
+        print(lang.gettext("\nStopping the container..."))
         self.docker_process.start("docker stop namsel-ocr")
         self.docker_process.waitForFinished()
         self.docker_process.close()
-        print("The container has been stopped!\n")
+        print(lang.gettext("The container has been stopped!\n"))
 
     def kill(self):
-        print("\nKilling the container...")
+        print(lang.gettext("\nKilling the container..."))
         self.docker_process.start("docker rm -f namsel-ocr")
         self.docker_process.waitForFinished()
         self.docker_process.close()
-        print("The container has been killed!")
+        print(lang.gettext("The container has been killed!"))
 
 class NamselOcr(QMainWindow):
-    global docker, work_directory
+    global docker
 
     def __init__(self, p_arg={"threshold":"", "layout":""},\
                  o_arg={"page_type":"pecha", "line_break_method":"line_cluster",\
@@ -76,7 +87,7 @@ class NamselOcr(QMainWindow):
         self.o_arg = o_arg
 
         # Title
-        self.setWindowTitle("Namsel Ocr")
+        self.setWindowTitle(lang.gettext("Namsel Ocr"))
 
         # Set the statusbar on
         self.setStatusBar(QStatusBar(self))
@@ -91,32 +102,32 @@ class NamselOcr(QMainWindow):
         self.menu = self.menuBar()
         self.menu.setNativeMenuBar(False)
             # File
-        self.file_menu = self.menu.addMenu("&File")
-        self.new_subaction = QAction("New", self)
-        self.new_subaction.setStatusTip("Open a new windows")
-        self.open_file_subaction = QAction("open an image...", self)
-        self.open_file_subaction.setStatusTip("Open a scan image file")
-        self.open_dir_subaction = QAction("Select a directory...", self)
-        self.open_dir_subaction.setStatusTip("Select a directory containing the images of a volume")
-        self.exit_subaction = QAction("Exit", self)
-        self.exit_subaction.setStatusTip("Exit Namsel OCR")
+        self.file_menu = self.menu.addMenu(lang.gettext("&File"))
+        self.new_subaction = QAction(lang.gettext("New"), self)
+        self.new_subaction.setStatusTip(lang.gettext("Open a new windows"))
+        self.open_file_subaction = QAction(lang.gettext("open an image..."), self)
+        self.open_file_subaction.setStatusTip(lang.gettext("Open a scan image file"))
+        self.open_dir_subaction = QAction(lang.gettext("Select a directory..."), self)
+        self.open_dir_subaction.setStatusTip(lang.gettext("Select a directory containing the images of a volume"))
+        self.exit_subaction = QAction(lang.gettext("Exit"), self)
+        self.exit_subaction.setStatusTip(lang.gettext("Exit Namsel OCR"))
         self.file_menu.addAction(self.new_subaction)
         self.file_menu.addAction(self.open_file_subaction)
         self.file_menu.addAction(self.open_dir_subaction)
         self.file_menu.addAction(self.exit_subaction)
             # Edit
-        self.edit_menu = self.menu.addMenu("&Edit")
-        self.pref_subaction = QAction("Preferences...", self)
-        self.pref_subaction.setStatusTip("Preprocess and Ocr settings...")
+        self.edit_menu = self.menu.addMenu(lang.gettext("&Edit"))
+        self.pref_subaction = QAction(lang.gettext("Preferences..."), self)
+        self.pref_subaction.setStatusTip(lang.gettext("Preprocess and Ocr settings..."))
         self.edit_menu.addAction(self.pref_subaction)
             # Options
-        self.option_menu = self.menu.addMenu("&Option")
+        self.option_menu = self.menu.addMenu(lang.gettext("&Option"))
                 # Modes
         self.mode_subactiongroup = QActionGroup(self)
-        self.prep_subaction = QAction("Preprocess mode", self)
-        self.prep_subaction.setStatusTip("open the preprocess mode windows")
-        self.ocr_subaction = QAction("Ocr mode", self)
-        self.ocr_subaction.setStatusTip("open the ocr mode windows")
+        self.prep_subaction = QAction(lang.gettext("Preprocess mode"), self)
+        self.prep_subaction.setStatusTip(lang.gettext("open the preprocess mode windows"))
+        self.ocr_subaction = QAction(lang.gettext("Ocr mode"), self)
+        self.ocr_subaction.setStatusTip(lang.gettext("open the ocr mode windows"))
         self.prep_subaction.setCheckable(True)
         self.ocr_subaction.setCheckable(True)
         self.mode_subactiongroup.addAction(self.prep_subaction)
@@ -125,22 +136,25 @@ class NamselOcr(QMainWindow):
         self.option_menu.addActions(self.mode_subactiongroup.actions())
         self.option_menu.addSeparator()
                 # Language
-        self.lang_submenu = self.option_menu.addMenu("&Language")
+        self.lang_submenu = self.option_menu.addMenu(lang.gettext("&Language"))
         self.lang_subactiongroup = QActionGroup(self)
                     #Tibetan
         self.bo_lang_subaction = QAction("བོད་ཡིག", self)
+        self.bo_lang_subaction.setIconText("bo")
         self.font = QFont()
         self.font.setFamily('Microsoft Himalaya')
         self.bo_lang_subaction.setFont(self.font)
                     # Other languages
         self.en_lang_subaction = QAction("English", self)
-        self.es_lang_subaction = QAction("Español", self)
+        self.en_lang_subaction.setIconText("en")
         self.fr_lang_subaction = QAction("Français", self)
+        self.fr_lang_subaction.setIconText("fr")
         self.zhs_lang_subaction = QAction("简体字", self)
+        self.zhs_lang_subaction.setIconText("zh_CN")
         self.zht_lang_subaction = QAction("繁體字", self)
+        self.zht_lang_subaction.setIconText("zh_TW")
         self.bo_lang_subaction.setCheckable(True)
         self.en_lang_subaction.setCheckable(True)
-        self.es_lang_subaction.setCheckable(True)
         self.fr_lang_subaction.setCheckable(True)
         self.zhs_lang_subaction.setCheckable(True)
         self.zht_lang_subaction.setCheckable(True)
@@ -149,15 +163,19 @@ class NamselOcr(QMainWindow):
         self.lang_subactiongroup.addAction(self.fr_lang_subaction)
         self.lang_subactiongroup.addAction(self.zhs_lang_subaction)
         self.lang_subactiongroup.addAction(self.zht_lang_subaction)
-        self.en_lang_subaction.setChecked(True)
+
+        for c in self.lang_subactiongroup.actions():
+            if c.iconText() == lang.info()["language"]:
+                c.setChecked(True)
+
         self.lang_submenu.addActions(self.lang_subactiongroup.actions())
             # ?
-        self.help_menu = self.menu.addMenu("&?")
-        self.about_subaction = QAction("About...", self)
-        self.about_subaction.setStatusTip("Version & credits of Namsel Ocr")
+        self.help_menu = self.menu.addMenu(lang.gettext("&?"))
+        self.about_subaction = QAction(lang.gettext("About..."), self)
+        self.about_subaction.setStatusTip(lang.gettext("Version & credits of Namsel Ocr"))
         self.help_menu.addAction(self.about_subaction)
-        self.help_subaction = QAction("help...", self)
-        self.help_subaction.setStatusTip("Some useful helps")
+        self.help_subaction = QAction(lang.gettext("help..."), self)
+        self.help_subaction.setStatusTip(lang.gettext("Some useful helps"))
         self.help_menu.addAction(self.help_subaction)
 
 
@@ -166,10 +184,10 @@ class NamselOcr(QMainWindow):
                 # Preprocess page
                     # Option
                         # Pecha - Book radiobuttons
-        self.ppecha_button = QRadioButton("Pecha")
-        self.ppecha_button.setStatusTip("The scan image is a pecha")
-        self.pbook_button = QRadioButton("Book")
-        self.pbook_button.setStatusTip("The scan image is a book")
+        self.ppecha_button = QRadioButton(lang.gettext("Pecha"))
+        self.ppecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
+        self.pbook_button = QRadioButton(lang.gettext("Book"))
+        self.pbook_button.setStatusTip(lang.gettext("The scan image is a book"))
         self.ppecha_button.setCheckable(True)
         self.pbook_button.setCheckable(True)
         self.ppecha_button.setChecked(True)
@@ -182,9 +200,9 @@ class NamselOcr(QMainWindow):
         self.ppecha_book_group.setLayout(self.ppecha_book_layout)
 
                         # Label and the thickness value
-        self.psliderlabel_val = QLabel("Thickness: ")
+        self.psliderlabel_val = QLabel(lang.gettext("Thickness: "))
         self.plcd = QLCDNumber()
-        self.plcd.setStatusTip("The thickness value during the preprocess")
+        self.plcd.setStatusTip(lang.gettext("The thickness value during the preprocess"))
         self.plcd.setSegmentStyle(QLCDNumber.Flat)
         self.plcd.setFixedWidth(40)
 
@@ -199,7 +217,7 @@ class NamselOcr(QMainWindow):
         self.pslider.setSingleStep(1)
         self.pslider.setTickPosition(QSlider.TicksBelow)
         self.pslider.setTickInterval(5)
-        self.pslider.setStatusTip("Set the thickness of the scan image")
+        self.pslider.setStatusTip(lang.gettext("Set the thickness of the scan image"))
 
         self.pslider_layout = QVBoxLayout()
         self.pslider_layout.addLayout(self.pslider_label_num_layout)
@@ -209,11 +227,11 @@ class NamselOcr(QMainWindow):
         self.pslider_group.setLayout(self.pslider_layout)
 
                         # Run the Preprocess
-        self.pdouble_page = QCheckBox("Double page")
-        self.pdouble_page.setStatusTip("The scan image is a double page")
+        self.pdouble_page = QCheckBox(lang.gettext("Double page"))
+        self.pdouble_page.setStatusTip(lang.gettext("The scan image is a double page"))
         self.pdouble_page.setVisible(False)
-        self.prun_button = QPushButton("Run")
-        self.prun_button.setStatusTip("Run the preprocess")
+        self.prun_button = QPushButton(lang.gettext("Run"))
+        self.prun_button.setStatusTip(lang.gettext("Run the preprocess"))
 
         self.prun_layout = QVBoxLayout()
         self.prun_layout.addWidget(self.pdouble_page)
@@ -236,14 +254,14 @@ class NamselOcr(QMainWindow):
                         # Scan image widget
         self.pscan_image_layer1 = QLabel()
         self.pscan_image_layer2 = QLabel()
-        self.pscan_image_layer1.setStatusTip("The scan image")
-        self.pscan_image_layer2.setStatusTip("The scan image")
+        self.pscan_image_layer1.setStatusTip(lang.gettext("The scan image"))
+        self.pscan_image_layer2.setStatusTip(lang.gettext("The scan image"))
 
                         # Result image widget
         self.presult_image_layer1 = QLabel()
         self.presult_image_layer2 = QLabel()
-        self.presult_image_layer1.setStatusTip("The result 'scantailored' image")
-        self.presult_image_layer2.setStatusTip("The result 'scantailored' image")
+        self.presult_image_layer1.setStatusTip(lang.gettext("The result 'scantailored' image"))
+        self.presult_image_layer2.setStatusTip(lang.gettext("The result 'scantailored' image"))
 
                     # Image layout & widget
         self.pimage_hlayout = QHBoxLayout()
@@ -281,10 +299,10 @@ class NamselOcr(QMainWindow):
                 # Ocr page options
                     # Option
                         # Pecha - Book radiobuttons
-        self.opecha_button = QRadioButton("Pecha")
-        self.opecha_button.setStatusTip("The scan image is a pecha")
-        self.obook_button = QRadioButton("Book")
-        self.obook_button.setStatusTip("The scan image is a book")
+        self.opecha_button = QRadioButton(lang.gettext("Pecha"))
+        self.opecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
+        self.obook_button = QRadioButton(lang.gettext("Book"))
+        self.obook_button.setStatusTip(lang.gettext("The scan image is a book"))
         self.opecha_button.setCheckable(True)
         self.obook_button.setCheckable(True)
         self.opecha_button.setChecked(True)
@@ -297,8 +315,8 @@ class NamselOcr(QMainWindow):
         self.opecha_book_group.setLayout(self.opecha_book_layout)
 
                         # Low ink
-        self.olowink = QCheckBox("Low ink")
-        self.olowink.setStatusTip("Check if the scan image is a bit of low quality")
+        self.olowink = QCheckBox(lang.gettext("Low ink"))
+        self.olowink.setStatusTip(lang.gettext("Check if the scan image is a bit of low quality"))
 
         self.olowink_layout = QVBoxLayout()
         self.olowink_layout.addWidget(self.olowink)
@@ -307,12 +325,12 @@ class NamselOcr(QMainWindow):
         self.olowink_group.setLayout(self.olowink_layout)
 
                         # Label and the dial value
-        self.odialabel_val = QLabel("Break width: ")
+        self.odialabel_val = QLabel(lang.gettext("Break width: "))
         self.olcd = QLCDNumber()
-        self.olcd.setStatusTip("The break-Width value")
+        self.olcd.setStatusTip(lang.gettext("The break-Width value"))
         self.olcd.setSegmentStyle(QLCDNumber.Flat)
         self.olcd.setFixedWidth(40)
-        self.olcd.display("Off")
+        self.olcd.display(lang.gettext("Off"))
 
         self.odial_label_num_layout = QHBoxLayout()
         self.odial_label_num_layout.addWidget(self.odialabel_val)
@@ -323,7 +341,7 @@ class NamselOcr(QMainWindow):
         self.odial = QDial()
         self.odial.setRange(0, 8)
         self.odial.setNotchesVisible(True)
-        self.odial.setStatusTip("To controls how horizontally-connected stacks will be segmented")
+        self.odial.setStatusTip(lang.gettext("To controls how horizontally-connected stacks will be segmented"))
 
         self.odial_layout = QHBoxLayout()
         self.odial_layout.addLayout(self.odial_label_num_layout)
@@ -334,11 +352,11 @@ class NamselOcr(QMainWindow):
 
 
                         # Run the Ocr
-        self.oclearhr = QCheckBox("Clear HR")
-        self.oclearhr.setStatusTip("The scan image is a double page")
+        self.oclearhr = QCheckBox(lang.gettext("Clear HR"))
+        self.oclearhr.setStatusTip(lang.gettext("The scan image is a double page"))
         self.oclearhr.setVisible(False)
-        self.orun_button = QPushButton("Run")
-        self.orun_button.setStatusTip("Run the ocr")
+        self.orun_button = QPushButton(lang.gettext("Run"))
+        self.orun_button.setStatusTip(lang.gettext("Run the ocr"))
 
         self.orun_layout = QVBoxLayout()
         self.orun_layout.addWidget(self.oclearhr)
@@ -362,14 +380,14 @@ class NamselOcr(QMainWindow):
                         # Scan image widget
         self.oscan_image_layer1 = QLabel()
         self.oscan_image_layer2 = QLabel()
-        self.oscan_image_layer1.setStatusTip("The scan image")
-        self.oscan_image_layer2.setStatusTip("The scan image")
+        self.oscan_image_layer1.setStatusTip(lang.gettext("The scan image"))
+        self.oscan_image_layer2.setStatusTip(lang.gettext("The scan image"))
 
                         # Result text widget
         self.otext_layer1 = QTextEdit()
         self.otext_layer2 = QTextEdit()
-        self.otext_layer1.setStatusTip("The ocr result")
-        self.otext_layer2.setStatusTip("The ocr result")
+        self.otext_layer1.setStatusTip(lang.gettext("The ocr result"))
+        self.otext_layer2.setStatusTip(lang.gettext("The ocr result"))
         self.otext_layer1.setFont(self.font)
         self.otext_layer2.setFont(self.font)
         self.otext_layer1.setFontPointSize(18)
@@ -403,7 +421,7 @@ class NamselOcr(QMainWindow):
         self.ocr_layout = QVBoxLayout()
         self.ocr_layout.addWidget(self.ooption_widget)
         self.ocr_layout.addWidget(self.oimagetext_widget)
-        
+
         self.ocrpage_widget = QWidget()
         self.ocrpage_widget.setLayout(self.ocr_layout)
 
@@ -422,7 +440,7 @@ class NamselOcr(QMainWindow):
         # Waiting progress dialog
         self.progress = QProgressDialog(None, Qt.WindowTitleHint)
         self.progress.setWindowFlags(self.progress.windowFlags() & ~Qt.WindowCloseButtonHint)
-        self.progress.setWindowTitle("Docker process")
+        self.progress.setWindowTitle(lang.gettext("Docker process"))
         self.progress.setCancelButton(None)
         self.progress.setWindowModality(Qt.ApplicationModal)
         self.progress.setRange(0, 0)
@@ -430,7 +448,7 @@ class NamselOcr(QMainWindow):
 
         # Volume Yes/No dialog
         self.pvolume_dialogbuttonbox = QDialogButtonBox(QDialogButtonBox.Yes | QDialogButtonBox.No)
-        self.pvolume_dialogbuttonbox.setWindowTitle("Preprocess all the volume images?")
+        self.pvolume_dialogbuttonbox.setWindowTitle(lang.gettext("Preprocess all the volume images?"))
         self.pvolume_dialogbuttonbox.setFixedSize(self.x_wsize / 2, self.y_wsize / 6)
         self.pvolume_dialogbuttonbox.setCenterButtons(True)
         self.pvolume_dialogbuttonbox.setWindowModality(Qt.ApplicationModal)
@@ -439,6 +457,7 @@ class NamselOcr(QMainWindow):
             # Menu
         self.new_subaction.triggered.connect(self.init)
         self.exit_subaction.triggered.connect(self.close)
+        self.lang_subactiongroup.triggered.connect(self.lang)
         #self.help_subaction.triggered.connect(self.test)
         # self.about_subaction.triggered.connect(self.ready)
             # Preprocess
@@ -447,8 +466,7 @@ class NamselOcr(QMainWindow):
         self.pdouble_page.toggled.connect(self.pdouble)
         self.open_file_subaction.triggered.connect(self.openScanImage)
         self.open_dir_subaction.triggered.connect(self.openScanDirImage)
-        self.pvolume_dialogbuttonbox.accepted.connect(lambda: self.preprocessRun(True))
-        self.pvolume_dialogbuttonbox.rejected.connect(self.preprocessRun)
+        self.pvolume_dialogbuttonbox.clicked.connect(lambda x: self.preprocessRun(x.text() == "&Yes"))
         self.prun_button.released.connect(self.preprocessRun)
             # Ocr
         self.odial.valueChanged.connect(lambda x: self.olcd.display(x/2) if x else self.olcd.display("Off"))
@@ -459,29 +477,6 @@ class NamselOcr(QMainWindow):
                 # Docker
         docker.docker_preprocess.finished.connect(self.preprocessFinished)
         docker.docker_ocr.finished.connect(self.ocrFinished)
-
-    def pbook(self, x):
-        if x:
-            if not self.pdouble_page.isChecked():
-                self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
-            self.pdouble_page.show()
-        else:
-            self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
-            self.pdouble_page.hide()
-
-    def pdouble(self, x):
-        if x:
-            self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
-        else:
-            self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
-
-    def obook(self, x):
-        if x:
-            self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_hwidget)
-            self.oclearhr.show()
-        else:
-            self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
-            self.oclearhr.hide()
 
     def init(self):
         self.petat = self.oetat = ""
@@ -504,13 +499,13 @@ class NamselOcr(QMainWindow):
                 del self.scan_image_name
                 self.pscan_image_layer1.clear()
                 self.pscan_image_layer2.clear()
+                self.oscan_image_layer1.clear()
+                self.oscan_image_layer2.clear()
                 del self.psimage
             if self.scan_image_filename:
                 del self.scan_image_filename
                 self.presult_image_layer1.clear()
                 self.presult_image_layer2.clear()
-                self.oscan_image_layer1.clear()
-                self.oscan_image_layer2.clear()
                 del self.primage
         except: pass
 
@@ -528,18 +523,59 @@ class NamselOcr(QMainWindow):
                 os.remove(f)
 
     def del_out_dir(self):
-        if os.path.isdir(work_directory + "/out"):
-            rmtree(work_directory + "/out")
+        if os.path.isdir(os.path.join(work_directory, "out")):
+            rmtree(os.path.join(work_directory, "out"))
+
+    def lang(self, e):
+        global lang
+        lang = languages[e.iconText()]
+        qApp.exit(2)
+
+    def pbook(self, e):
+        if e:
+            if not self.pdouble_page.isChecked():
+                self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
+            self.pdouble_page.show()
+            self.obook_button.setChecked(True)
+        else:
+            self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
+            self.pdouble_page.hide()
+            self.opecha_button.setChecked(True)
+
+    def pdouble(self, e):
+        if e:
+            self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
+        else:
+            self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
+
+    def obook(self, e):
+        if e:
+            self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_hwidget)
+            self.oclearhr.show()
+            self.pbook_button.setChecked(True)
+        else:
+            self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
+            self.oclearhr.hide()
+            self.ppecha_button.setChecked(True)
+
+    def wait(self, label):
+        self.progress.setLabelText(label)
+        self.progress.show()
 
     def openScanImage(self, folder=""):
         if not folder: folder = ""
-        self.scan_image_name, _ = QFileDialog.getOpenFileName(self, "Open the source scan image...",\
-                                                              folder, "Image files (*.tif)")
+
+        self.scan_image_name, _ = QFileDialog.getOpenFileName(self, lang.gettext("Open the source scan image..."),\
+                                                              folder, lang.gettext("Image files (*.tif)"))
         if self.scan_image_name:
             if self.petat == "Result":
                 self.presult_image_layer1.clear()
                 self.presult_image_layer2.clear()
                 self.del_out_dir()
+            if self.oetat == "Ocr":
+                self.otext_layer1.clear()
+                self.otext_layer2.clear()
+                os.remove(os.path.join(work_directory, "ocr_output.txt"))
             self.psimage = QPixmap(self.scan_image_name)
             self.pscan_image_layer1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
             self.pscan_image_layer2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
@@ -551,11 +587,17 @@ class NamselOcr(QMainWindow):
                 self.prun_etat = False
 
     def openScanDirImage(self):
-        self.scan_folder_name =\
-            QFileDialog.getExistingDirectory(self, "Open a directory containing the scan images of a volume...", "")
+        self.scan_folder_name = QFileDialog.getExistingDirectory(self, lang.gettext(
+            "Open a directory containing the scan images of a volume..."), "")
         if self.scan_folder_name:
             self.pvolume = True
             self.openScanImage(self.scan_folder_name)
+
+    def volume(self, e):
+        if e.text() == "&Yes":
+            self.preprocess(True)
+        else:
+            self.preprocess()
 
     def preprocessRun(self, all=""):
         if self.petat == "Scan":
@@ -566,7 +608,7 @@ class NamselOcr(QMainWindow):
             elif self.pvolume_dialogbuttonbox.isVisible():
                 self.pvolume_dialogbuttonbox.hide()
 
-            self.wait("Preprocess is running...")
+            self.wait(lang.gettext("Preprocess is running..."))
 
             if not all:
                 copy(self.scan_image_name, work_directory)
@@ -574,7 +616,7 @@ class NamselOcr(QMainWindow):
                 for f in os.listdir(self.scan_folder_name):
                     if f.endswith(".tif"):
                         while True:
-                            ack = copy(self.scan_folder_name+"/"+f, work_directory)
+                            ack = copy(os.path.join(self.scan_folder_name, f), work_directory)
                             if ack.find(f): break
 
             if self.pslider.value(): self.p_arg["threshold"] = self.pslider.value()
@@ -601,10 +643,15 @@ class NamselOcr(QMainWindow):
             self.petat = "Result"
 
         docker.docker_preprocess.close()
-        print("...is now finished!")
+        print(lang.gettext("...is now finished!"))
         self.progress.cancel()
 
     def ocrRun(self, o_arg=[]):
+        if self.petat == "Scan":
+            copy(self.scan_image_name, work_directory)
+        elif not (self.petat == "Scan" or self.petat == "Result"):
+            return
+
         if self.obook_button.isChecked():
             self.o_arg["page_type"] = "book"
             self.o_arg["line_break_method"] = "line_cut"
@@ -612,7 +659,8 @@ class NamselOcr(QMainWindow):
         if self.olowink.isChecked(): self.o_arg["low_ink"] = True
         if self.odial.value(): self.o_arg["break_width"] = self.odial.value()/2
 
-        self.wait("Ocr is running...")
+        self.wait(lang.gettext("Ocr is running..."))
+
         docker.ocr(self.o_arg)
 
     def ocrFinished(self):
@@ -620,7 +668,7 @@ class NamselOcr(QMainWindow):
                       "clear_hr":"", "low_ink":"", "break_width":""}
         self.oetat = "Ocr"
         docker.docker_ocr.close()
-        print("...is now finished!")
+        print(lang.gettext("...is now finished!"))
         self.copyFile2Qtext("ocr_output.txt")
         self.progress.cancel()
 
@@ -629,10 +677,6 @@ class NamselOcr(QMainWindow):
             data = file.read()
         self.otext_layer1.setText(data)
         self.otext_layer2.setText(data)
-
-    def wait(self, label):
-        self.progress.setLabelText(label)
-        self.progress.show()
 
 def killEnvironment():
     global docker, work_directory
@@ -644,13 +688,18 @@ def killEnvironment():
     if os.path.isdir(work_directory):
         rmtree(work_directory)
 
-setEnvironment()
+if __name__ == "__main__":
+    setEnvironment()
 
-app = QApplication(sys.argv)
+    while True:
+        app = QApplication(sys.argv)
 
-namsel_ocr = NamselOcr()
-namsel_ocr.show()
+        namsel_ocr = NamselOcr()
+        namsel_ocr.show()
 
-app.exec_()
+        rcode = app.exec_()
+        if not rcode: break
+        else:
+            del app, namsel_ocr
 
-killEnvironment()
+    killEnvironment()

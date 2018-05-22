@@ -1,0 +1,282 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2018-05-20 10:56+0800\n"
+"PO-Revision-Date: 2018-05-20 11:30+0800\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 2.0.7\n"
+"Last-Translator: Thutbenrigzin <contact@thubtenrigzin.fr>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: fr\n"
+
+#: namsel.py:39
+msgid ""
+"\n"
+"Docker Namsel Ocr is now running!\n"
+msgstr ""
+"\n"
+"Docker Namsel Ocr est en cours d'exécution !\n"
+
+#: namsel.py:43
+msgid ""
+"\n"
+"Preprocess is running..."
+msgstr ""
+"\n"
+"Le pré-traitement est en cours d'éxécution..."
+
+#: namsel.py:49
+msgid ""
+"\n"
+"Ocr is running..."
+msgstr ""
+"\n"
+"Ocr est en cours d'éxécution..."
+
+#: namsel.py:54
+msgid ""
+"\n"
+"Stopping the container..."
+msgstr ""
+"\n"
+"Arrêt du conteneur..."
+
+#: namsel.py:58
+msgid "The container has been stopped!\n"
+msgstr "Les conténeur est arrêté !!\n"
+
+#: namsel.py:61
+msgid ""
+"\n"
+"Killing the container..."
+msgstr ""
+"\n"
+"Désinstallation du conteneur..."
+
+#: namsel.py:65
+msgid "The container has been killed!"
+msgstr "Le conteneur est désinstallé !"
+
+#: namsel.py:82
+msgid "Namsel Ocr"
+msgstr ""
+
+#: namsel.py:97
+msgid "&File"
+msgstr "&Fichier"
+
+#: namsel.py:98
+msgid "New"
+msgstr "Nouveau"
+
+#: namsel.py:99
+msgid "Open a new windows"
+msgstr "Ouvrir une nouvelle fenêtre"
+
+#: namsel.py:100
+msgid "open an image..."
+msgstr "ouvrir une image..."
+
+#: namsel.py:101
+msgid "Open a scan image file"
+msgstr "Ouvrir un fichier d'image scannée"
+
+#: namsel.py:102
+msgid "Select a directory..."
+msgstr "Sélectionner un répertoire..."
+
+#: namsel.py:103
+msgid "Select a directory containing the images of a volume"
+msgstr "Sélectionner un répertoire contenant les images d'un volume"
+
+#: namsel.py:104
+msgid "Exit"
+msgstr "Quitter"
+
+#: namsel.py:105
+msgid "Exit Namsel OCR"
+msgstr "Quitter Namsel Ocr"
+
+#: namsel.py:111
+msgid "&Edit"
+msgstr "&Édition"
+
+#: namsel.py:112
+msgid "Preferences..."
+msgstr "Préférence..."
+
+#: namsel.py:113
+msgid "Preprocess and Ocr settings..."
+msgstr "Pré-traitement et paramètre de l'Ocr..."
+
+#: namsel.py:116
+msgid "&Option"
+msgstr ""
+
+#: namsel.py:119
+msgid "Preprocess mode"
+msgstr "Mode de pré-traitement"
+
+#: namsel.py:120
+msgid "open the preprocess mode windows"
+msgstr "ouvrir la fenêtre du mode de pré-traitement"
+
+#: namsel.py:121
+msgid "Ocr mode"
+msgstr "Mode Ocr"
+
+#: namsel.py:122
+msgid "open the ocr mode windows"
+msgstr "ouvrir la fenêtre du mode de l'ocr"
+
+#: namsel.py:131
+msgid "&Language"
+msgstr "&Langue"
+
+#: namsel.py:158
+msgid "&?"
+msgstr ""
+
+#: namsel.py:159
+msgid "About..."
+msgstr "À propos..."
+
+#: namsel.py:160
+msgid "Version & credits of Namsel Ocr"
+msgstr "Version & générique de remerciement de Namsel Ocr"
+
+#: namsel.py:162
+msgid "help..."
+msgstr "aide..."
+
+#: namsel.py:163
+msgid "Some useful helps"
+msgstr "Quelques informations utiles"
+
+#: namsel.py:172 namsel.py:287
+msgid "Pecha"
+msgstr ""
+
+#: namsel.py:173 namsel.py:288
+msgid "The scan image is a pecha"
+msgstr "L'image scannée est un pecha"
+
+#: namsel.py:174 namsel.py:289
+msgid "Book"
+msgstr "Livre"
+
+#: namsel.py:175 namsel.py:290
+msgid "The scan image is a book"
+msgstr "L'image scannée est un livre"
+
+#: namsel.py:188
+msgid "Thickness: "
+msgstr "Épaisseur: "
+
+#: namsel.py:190
+msgid "The thickness value during the preprocess"
+msgstr "Valeur de l'épaisseur pendant le pré-traitement"
+
+#: namsel.py:205
+msgid "Set the thickness of the scan image"
+msgstr "Fixer la valeur de épaisseur de l'image scannée"
+
+#: namsel.py:215
+msgid "Double page"
+msgstr "Page double"
+
+#: namsel.py:216 namsel.py:341
+msgid "The scan image is a double page"
+msgstr "L'image scannée est une page double"
+
+#: namsel.py:218 namsel.py:343
+msgid "Run"
+msgstr "Exécuter"
+
+#: namsel.py:219
+msgid "Run the preprocess"
+msgstr "Lance le pré-traitement"
+
+#: namsel.py:242 namsel.py:243 namsel.py:368 namsel.py:369
+msgid "The scan image"
+msgstr "L'image scannée"
+
+#: namsel.py:248 namsel.py:249
+msgid "The result 'scantailored' image"
+msgstr "Le résultat de l'image traitée par 'Scantailor'"
+
+#: namsel.py:303
+msgid "Low ink"
+msgstr "Niveau d'encre bas"
+
+#: namsel.py:304
+msgid "Check if the scan image is a bit of low quality"
+msgstr "Cocher si l'image scannée est de mauvaise qualité"
+
+#: namsel.py:313
+msgid "Break width: "
+msgstr "Largeur de coupure: "
+
+#: namsel.py:315
+msgid "The break-Width value"
+msgstr "Taille de la coupure"
+
+#: namsel.py:318
+msgid "Off"
+msgstr ""
+
+#: namsel.py:329
+msgid "To controls how horizontally-connected stacks will be segmented"
+msgstr "Pour controler comment les empillations connectées horizontalement seront segmentées"
+
+#: namsel.py:340
+msgid "Clear HR"
+msgstr "Supprimer la d'entête"
+
+#: namsel.py:344
+msgid "Run the ocr"
+msgstr "Lancer l'ocr"
+
+#: namsel.py:374 namsel.py:375
+msgid "The ocr result"
+msgstr "Résultat de l'ocr"
+
+#: namsel.py:428
+msgid "Docker process"
+msgstr "Processus de Docker"
+
+#: namsel.py:436
+msgid "Preprocess all the volume images?"
+msgstr "Pré-traiter toutes les images du volume ?"
+
+#: namsel.py:543
+msgid "Open the source scan image..."
+msgstr "Ouvrir l'image scannée source..."
+
+#: namsel.py:544
+msgid "Image files (*.tif)"
+msgstr "Fichiers images (*tif)"
+
+#: namsel.py:566
+msgid "Open a directory containing the scan images of a volume..."
+msgstr "Ouvrir un répertoire contenant les images scannées d'un volume..."
+
+#: namsel.py:580
+msgid "Preprocess is running..."
+msgstr "Le pré-traitement est en cours d'éxécution..."
+
+#: namsel.py:615 namsel.py:634
+msgid "...is now finished!"
+msgstr "...est maintenant terminé !"
+
+#: namsel.py:626
+msgid "Ocr is running..."
+msgstr "L'ocr est en cours d'éxécution..."

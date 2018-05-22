@@ -1,0 +1,272 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2018-05-20 10:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=cp1252\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: namsel.py:39
+msgid ""
+"\n"
+"Docker Namsel Ocr is now running!\n"
+msgstr ""
+
+#: namsel.py:43
+msgid ""
+"\n"
+"Preprocess is running..."
+msgstr ""
+
+#: namsel.py:49
+msgid ""
+"\n"
+"Ocr is running..."
+msgstr ""
+
+#: namsel.py:54
+msgid ""
+"\n"
+"Stopping the container..."
+msgstr ""
+
+#: namsel.py:58
+msgid ""
+"The container has been stopped!\n"
+msgstr ""
+
+#: namsel.py:61
+msgid ""
+"\n"
+"Killing the container..."
+msgstr ""
+
+#: namsel.py:65
+msgid "The container has been killed!"
+msgstr ""
+
+#: namsel.py:82
+msgid "Namsel Ocr"
+msgstr ""
+
+#: namsel.py:97
+msgid "&File"
+msgstr ""
+
+#: namsel.py:98
+msgid "New"
+msgstr ""
+
+#: namsel.py:99
+msgid "Open a new windows"
+msgstr ""
+
+#: namsel.py:100
+msgid "open an image..."
+msgstr ""
+
+#: namsel.py:101
+msgid "Open a scan image file"
+msgstr ""
+
+#: namsel.py:102
+msgid "Select a directory..."
+msgstr ""
+
+#: namsel.py:103
+msgid "Select a directory containing the images of a volume"
+msgstr ""
+
+#: namsel.py:104
+msgid "Exit"
+msgstr ""
+
+#: namsel.py:105
+msgid "Exit Namsel OCR"
+msgstr ""
+
+#: namsel.py:111
+msgid "&Edit"
+msgstr ""
+
+#: namsel.py:112
+msgid "Preferences..."
+msgstr ""
+
+#: namsel.py:113
+msgid "Preprocess and Ocr settings..."
+msgstr ""
+
+#: namsel.py:116
+msgid "&Option"
+msgstr ""
+
+#: namsel.py:119
+msgid "Preprocess mode"
+msgstr ""
+
+#: namsel.py:120
+msgid "open the preprocess mode windows"
+msgstr ""
+
+#: namsel.py:121
+msgid "Ocr mode"
+msgstr ""
+
+#: namsel.py:122
+msgid "open the ocr mode windows"
+msgstr ""
+
+#: namsel.py:131
+msgid "&Language"
+msgstr ""
+
+#: namsel.py:158
+msgid "&?"
+msgstr ""
+
+#: namsel.py:159
+msgid "About..."
+msgstr ""
+
+#: namsel.py:160
+msgid "Version & credits of Namsel Ocr"
+msgstr ""
+
+#: namsel.py:162
+msgid "help..."
+msgstr ""
+
+#: namsel.py:163
+msgid "Some useful helps"
+msgstr ""
+
+#: namsel.py:172 namsel.py:287
+msgid "Pecha"
+msgstr ""
+
+#: namsel.py:173 namsel.py:288
+msgid "The scan image is a pecha"
+msgstr ""
+
+#: namsel.py:174 namsel.py:289
+msgid "Book"
+msgstr ""
+
+#: namsel.py:175 namsel.py:290
+msgid "The scan image is a book"
+msgstr ""
+
+#: namsel.py:188
+msgid "Thickness: "
+msgstr ""
+
+#: namsel.py:190
+msgid "The thickness value during the preprocess"
+msgstr ""
+
+#: namsel.py:205
+msgid "Set the thickness of the scan image"
+msgstr ""
+
+#: namsel.py:215
+msgid "Double page"
+msgstr ""
+
+#: namsel.py:216 namsel.py:341
+msgid "The scan image is a double page"
+msgstr ""
+
+#: namsel.py:218 namsel.py:343
+msgid "Run"
+msgstr ""
+
+#: namsel.py:219
+msgid "Run the preprocess"
+msgstr ""
+
+#: namsel.py:242 namsel.py:243 namsel.py:368 namsel.py:369
+msgid "The scan image"
+msgstr ""
+
+#: namsel.py:248 namsel.py:249
+msgid "The result 'scantailored' image"
+msgstr ""
+
+#: namsel.py:303
+msgid "Low ink"
+msgstr ""
+
+#: namsel.py:304
+msgid "Check if the scan image is a bit of low quality"
+msgstr ""
+
+#: namsel.py:313
+msgid "Break width: "
+msgstr ""
+
+#: namsel.py:315
+msgid "The break-Width value"
+msgstr ""
+
+#: namsel.py:318
+msgid "Off"
+msgstr ""
+
+#: namsel.py:329
+msgid "To controls how horizontally-connected stacks will be segmented"
+msgstr ""
+
+#: namsel.py:340
+msgid "Clear HR"
+msgstr ""
+
+#: namsel.py:344
+msgid "Run the ocr"
+msgstr ""
+
+#: namsel.py:374 namsel.py:375
+msgid "The ocr result"
+msgstr ""
+
+#: namsel.py:428
+msgid "Docker process"
+msgstr ""
+
+#: namsel.py:436
+msgid "Preprocess all the volume images?"
+msgstr ""
+
+#: namsel.py:543
+msgid "Open the source scan image..."
+msgstr ""
+
+#: namsel.py:544
+msgid "Image files (*.tif)"
+msgstr ""
+
+#: namsel.py:566
+msgid "Open a directory containing the scan images of a volume..."
+msgstr ""
+
+#: namsel.py:580
+msgid "Preprocess is running..."
+msgstr ""
+
+#: namsel.py:615 namsel.py:634
+msgid "...is now finished!"
+msgstr ""
+
+#: namsel.py:626
+msgid "Ocr is running..."
+msgstr ""
+
