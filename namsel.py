@@ -704,10 +704,12 @@ class NamselOcr(QMainWindow):
                 self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
             self.pd_widget.show()
             self.obook_button.setChecked(True)
+            self.abook_button.setChecked(True)
         else:
             self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
             self.pd_widget.hide()
             self.opecha_button.setChecked(True)
+            self.apecha_button.setChecked(True)
 
     def pdouble(self, e):
         if e:
@@ -720,18 +722,24 @@ class NamselOcr(QMainWindow):
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_hwidget)
             self.od_widget.show()
             self.pbook_button.setChecked(True)
+            self.abook_button.setChecked(True)
         else:
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
             self.od_widget.hide()
             self.ppecha_button.setChecked(True)
+            self.apecha_button.setChecked(True)
 
     def abook(self, e):
         if e:
             self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
             self.adc_widget.show()
+            self.pbook_button.setChecked(True)
+            self.obook_button.setChecked(True)
         else:
             self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
             self.adc_widget.hide()
+            self.ppecha_button.setChecked(True)
+            self.opecha_button.setChecked(True)
 
     def wait(self, label):
         self.progress.setLabelText(label)
