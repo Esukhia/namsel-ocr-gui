@@ -153,11 +153,6 @@ class NamselOcr(QMainWindow):
         self.zhs_lang_subaction.setIconText("zh_CN")
         self.zht_lang_subaction = QAction("繁體字", self)
         self.zht_lang_subaction.setIconText("zh_TW")
-        self.bo_lang_subaction.setCheckable(True)
-        self.en_lang_subaction.setCheckable(True)
-        self.fr_lang_subaction.setCheckable(True)
-        self.zhs_lang_subaction.setCheckable(True)
-        self.zht_lang_subaction.setCheckable(True)
         self.lang_subactiongroup.addAction(self.bo_lang_subaction)
         self.lang_subactiongroup.addAction(self.en_lang_subaction)
         self.lang_subactiongroup.addAction(self.fr_lang_subaction)
@@ -166,6 +161,7 @@ class NamselOcr(QMainWindow):
 
         for c in self.lang_subactiongroup.actions():
             if c.iconText() == lang.info()["language"]:
+                c.setCheckable(True)
                 c.setChecked(True)
 
         self.lang_submenu.addActions(self.lang_subactiongroup.actions())
@@ -447,17 +443,29 @@ class NamselOcr(QMainWindow):
         self.progress.cancel()
 
         # Volume Yes/No dialog
-        self.pvolume_dialogbuttonbox = QDialogButtonBox(QDialogButtonBox.Yes | QDialogButtonBox.No)
+        self.pvolume_dialogbuttonbox = QDialogButtonBox()
+        self.pvolume_dialogbuttonbox.addButton(lang.gettext("&Yes"), QDialogButtonBox.YesRole)
+        self.pvolume_dialogbuttonbox.addButton(lang.gettext("&No"), QDialogButtonBox.NoRole)
         self.pvolume_dialogbuttonbox.setWindowTitle(lang.gettext("Preprocess all the volume images?"))
         self.pvolume_dialogbuttonbox.setFixedSize(self.x_wsize / 2, self.y_wsize / 6)
         self.pvolume_dialogbuttonbox.setCenterButtons(True)
         self.pvolume_dialogbuttonbox.setWindowModality(Qt.ApplicationModal)
+
+        # Restart to Change the language
+        self.restart_dialogbuttonbox = QDialogButtonBox()
+        self.restart_dialogbuttonbox.addButton(lang.gettext("&Yes"), QDialogButtonBox.YesRole)
+        self.restart_dialogbuttonbox.addButton(lang.gettext("&No"), QDialogButtonBox.NoRole)
+        self.restart_dialogbuttonbox.setWindowTitle(lang.gettext("Namsel Ocr need to Restart to apply the changes..."))
+        self.restart_dialogbuttonbox.setFixedSize(self.x_wsize / 2, self.y_wsize / 6)
+        self.restart_dialogbuttonbox.setCenterButtons(True)
+        self.restart_dialogbuttonbox.setWindowModality(Qt.ApplicationModal)
 
         # Links between signals and slots
             # Menu
         self.new_subaction.triggered.connect(self.init)
         self.exit_subaction.triggered.connect(self.close)
         self.lang_subactiongroup.triggered.connect(self.lang)
+        self.restart_dialogbuttonbox.clicked.connect(self.lang)
         #self.help_subaction.triggered.connect(self.test)
         # self.about_subaction.triggered.connect(self.ready)
             # Preprocess
@@ -466,7 +474,7 @@ class NamselOcr(QMainWindow):
         self.pdouble_page.toggled.connect(self.pdouble)
         self.open_file_subaction.triggered.connect(self.openScanImage)
         self.open_dir_subaction.triggered.connect(self.openScanDirImage)
-        self.pvolume_dialogbuttonbox.clicked.connect(lambda x: self.preprocessRun(x.text() == "&Yes"))
+        self.pvolume_dialogbuttonbox.clicked.connect(lambda x: self.preprocessRun(x.text() == lang.gettext("&Yes")))
         self.prun_button.released.connect(self.preprocessRun)
             # Ocr
         self.odial.valueChanged.connect(lambda x: self.olcd.display(x/2) if x else self.olcd.display("Off"))
@@ -528,8 +536,16 @@ class NamselOcr(QMainWindow):
 
     def lang(self, e):
         global lang
-        lang = languages[e.iconText()]
-        qApp.exit(2)
+        if self.restart_dialogbuttonbox.isHidden():
+            self.lang_temp = languages[e.iconText()]
+            self.restart_dialogbuttonbox.show()
+            return
+        elif e.text() == lang.gettext("&Yes"):
+            lang = self.lang_temp
+            qApp.exit(2)
+        else:
+            self.restart_dialogbuttonbox.hide()
+            return
 
     def pbook(self, e):
         if e:
