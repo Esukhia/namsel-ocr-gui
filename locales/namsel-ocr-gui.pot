@@ -67,7 +67,7 @@ msgid "New"
 msgstr ""
 
 #: namsel.py:99
-msgid "Open a new windows"
+msgid "Open a new window"
 msgstr ""
 
 #: namsel.py:100
@@ -115,7 +115,7 @@ msgid "Preprocess mode"
 msgstr ""
 
 #: namsel.py:120
-msgid "open the preprocess mode windows"
+msgid "open the preprocess mode window"
 msgstr ""
 
 #: namsel.py:121
@@ -123,7 +123,7 @@ msgid "Ocr mode"
 msgstr ""
 
 #: namsel.py:122
-msgid "open the ocr mode windows"
+msgid "open the ocr mode window"
 msgstr ""
 
 #: namsel.py:131
@@ -276,4 +276,12 @@ msgstr ""
 
 #: namsel.py:452
 msgid "&No"
+msgstr ""
+
+#: namsel.py:128
+msgid "Auto mode"
+msgstr ""
+
+#: namsel.py:129
+msgid "open the auto mode window"
 msgstr ""
