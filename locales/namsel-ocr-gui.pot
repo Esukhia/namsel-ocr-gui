@@ -14,10 +14,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
+#: namsel.py:
+msgid ""
+"\n"
+"Running the container..."
+msgstr ""
 
 #: namsel.py:39
 msgid ""
-"\n"
 "Docker Namsel Ocr is now running!\n"
 msgstr ""
 
@@ -51,7 +55,7 @@ msgid ""
 msgstr ""
 
 #: namsel.py:65
-msgid "The container has been killed!"
+msgid "The container has been stopped and cleared!\n"
 msgstr ""
 
 #: namsel.py:82
@@ -284,4 +288,12 @@ msgstr ""
 
 #: namsel.py:129
 msgid "open the auto mode window"
+msgstr ""
+
+#: namsel.py:
+msgid "Autoprocess is running..."
+msgstr ""
+
+#: namsel.py:
+msgid "Namsel Ocr need to Restart to apply the changes..."
 msgstr ""

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2018-05-20 10:56+0800\n"
-"PO-Revision-Date: 2018-05-23 23:03+0800\n"
+"PO-Revision-Date: 2018-05-27 20:26+0800\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,13 +17,17 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Language: fr\n"
 
-#: namsel.py:39
+#: namsel.py:
 msgid ""
 "\n"
-"Docker Namsel Ocr is now running!\n"
+"Running the container..."
 msgstr ""
 "\n"
-"Docker Namsel Ocr est en cours d'exécution !\n"
+"Lancement du conteneur..."
+
+#: namsel.py:39
+msgid "Docker Namsel Ocr is now running!\n"
+msgstr "Docker Namsel Ocr est en cours d'exécution !\n"
 
 #: namsel.py:43
 msgid ""
@@ -50,8 +54,8 @@ msgstr ""
 "Arrêt du conteneur..."
 
 #: namsel.py:58
-msgid "The container has been stopped!\n"
-msgstr "Les conténeur est arrêté !!\n"
+msgid "The container has been stopped and cleared!\n"
+msgstr "Le conteneur a été arrêté et libéré !\n"
 
 #: namsel.py:61
 msgid ""
@@ -239,7 +243,7 @@ msgstr "Pour controler comment les empillations connectées horizontalement sero
 
 #: namsel.py:340
 msgid "Clear HR"
-msgstr "Supprimer la d'entête"
+msgstr "Pas d'entête"
 
 #: namsel.py:344
 msgid "Run the ocr"
@@ -296,3 +300,11 @@ msgstr "Mode automatique"
 #: namsel.py:129
 msgid "open the auto mode window"
 msgstr "ouvrir la fenêtre du mode automatique"
+
+#: namsel.py:
+msgid "Autoprocess is running..."
+msgstr "Le mode automatique est lancé..."
+
+#: namsel.py:
+msgid "Namsel Ocr need to Restart to apply the changes..."
+msgstr "Namsel doit redémarrer pour appliquer les changements..."
