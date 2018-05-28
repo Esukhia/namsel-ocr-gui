@@ -105,7 +105,7 @@ class NamselOcr(QMainWindow):
             # File
         self.file_menu = self.menu.addMenu(lang.gettext("&File"))
         self.new_subaction = QAction(lang.gettext("New"), self)
-        self.new_subaction.setStatusTip(lang.gettext("Open a new windows"))
+        self.new_subaction.setStatusTip(lang.gettext("Open a new window"))
         self.open_file_subaction = QAction(lang.gettext("open an image..."), self)
         self.open_file_subaction.setStatusTip(lang.gettext("Open a scan image file"))
         self.open_dir_subaction = QAction(lang.gettext("Select a directory..."), self)
@@ -126,11 +126,11 @@ class NamselOcr(QMainWindow):
                 # Modes
         self.mode_subactiongroup = QActionGroup(self)
         self.auto_subaction = QAction(lang.gettext("Auto mode"), self)
-        self.auto_subaction.setStatusTip(lang.gettext("open the auto mode windows"))
+        self.auto_subaction.setStatusTip(lang.gettext("open the auto mode window"))
         self.prep_subaction = QAction(lang.gettext("Preprocess mode"), self)
-        self.prep_subaction.setStatusTip(lang.gettext("open the preprocess mode windows"))
+        self.prep_subaction.setStatusTip(lang.gettext("open the preprocess mode window"))
         self.ocr_subaction = QAction(lang.gettext("Ocr mode"), self)
-        self.ocr_subaction.setStatusTip(lang.gettext("open the ocr mode windows"))
+        self.ocr_subaction.setStatusTip(lang.gettext("open the ocr mode window"))
         self.auto_subaction.setCheckable(True)
         self.prep_subaction.setCheckable(True)
         self.ocr_subaction.setCheckable(True)
@@ -318,26 +318,226 @@ class NamselOcr(QMainWindow):
         self.ascan_image_layer2.setStatusTip(lang.gettext("The scan image"))
 
                         # Result text widget
-        self.atext_layer1 = QTextEdit()
-        self.atext_layer2 = QTextEdit()
-        self.atext_layer1.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_layer2.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_layer1.setFont(self.font)
-        self.atext_layer2.setFont(self.font)
-        self.atext_layer1.setFontPointSize(18)
-        self.atext_layer2.setFontPointSize(18)
-        self.atext_layer1.hide()
-        self.atext_layer2.hide()
+        self.azone_layer1 = QWidget()
+        self.azone_layer2 = QWidget()
+        self.azone_layer1.hide()
+        self.azone_layer2.hide()
+
+                                # Left
+        self.atooltext_left_layer1 = QWidget()
+                                    # Toolbar for file comparison
+        self.atool_text_left_files_layer1 = QWidget()
+
+        self.atool_text_left_files_m40_layer1 = QRadioButton("-40")
+        self.atool_text_left_files_m30_layer1 = QRadioButton("-30")
+        self.atool_text_left_files_m20_layer1 = QRadioButton("-20")
+        self.atool_text_left_files_m10_layer1 = QRadioButton("-10")
+        self.atool_text_left_files_0_layer1 = QRadioButton("0")
+        self.atool_text_left_files_p10_layer1 = QRadioButton("10")
+        self.atool_text_left_files_p20_layer1 = QRadioButton("20")
+        self.atool_text_left_files_p30_layer1 = QRadioButton("30")
+        self.atool_text_left_files_p40_layer1 = QRadioButton("40")
+
+        self.atool_text_left_files_m40_layer1.hide()
+        self.atool_text_left_files_m30_layer1.hide()
+        self.atool_text_left_files_m20_layer1.hide()
+        self.atool_text_left_files_m10_layer1.hide()
+        self.atool_text_left_files_p10_layer1.hide()
+        self.atool_text_left_files_p20_layer1.hide()
+        self.atool_text_left_files_p30_layer1.hide()
+        self.atool_text_left_files_p40_layer1.hide()
+
+        self.atool_text_left_files_layer1_layout = QHBoxLayout()
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m40_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m30_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m20_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m10_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_0_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p10_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p20_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p30_layer1)
+        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p40_layer1)
+
+        self.atool_text_left_files_layer1.setLayout(self.atool_text_left_files_layer1_layout)
+
+                                    # Text
+        self.atext_left_layer1 = QTextEdit()
+        self.atext_left_layer1.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_left_layer1.setFont(self.font)
+        self.atext_left_layer1.setFontPointSize(18)
+
+        self.atooltext_left_layer1_layout = QVBoxLayout()
+        self.atooltext_left_layer1_layout.addWidget(self.atool_text_left_files_layer1)
+        self.atooltext_left_layer1_layout.addWidget(self.atext_left_layer1)
+        self.atooltext_left_layer1.setLayout(self.atooltext_left_layer1_layout)
+
+                                # Right
+        self.atooltext_right_layer1 = QWidget()
+                                    # Toolbar for file comparison
+        self.atool_text_right_files_layer1 = QWidget()
+
+        self.atool_text_right_files_m40_layer1 = QRadioButton("-40")
+        self.atool_text_right_files_m30_layer1 = QRadioButton("-30")
+        self.atool_text_right_files_m20_layer1 = QRadioButton("-20")
+        self.atool_text_right_files_m10_layer1 = QRadioButton("-10")
+        self.atool_text_right_files_0_layer1 = QRadioButton("0")
+        self.atool_text_right_files_p10_layer1 = QRadioButton("10")
+        self.atool_text_right_files_p20_layer1 = QRadioButton("20")
+        self.atool_text_right_files_p30_layer1 = QRadioButton("30")
+        self.atool_text_right_files_p40_layer1 = QRadioButton("40")
+
+        self.atool_text_right_files_m40_layer1.hide()
+        self.atool_text_right_files_m30_layer1.hide()
+        self.atool_text_right_files_m20_layer1.hide()
+        self.atool_text_right_files_m10_layer1.hide()
+        self.atool_text_right_files_p10_layer1.hide()
+        self.atool_text_right_files_p20_layer1.hide()
+        self.atool_text_right_files_p30_layer1.hide()
+        self.atool_text_right_files_p40_layer1.hide()
+
+        self.atool_text_right_files_layer1_layout = QHBoxLayout()
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m40_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m30_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m20_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m10_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_0_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p10_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p20_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p30_layer1)
+        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p40_layer1)
+
+        self.atool_text_right_files_layer1.setLayout(self.atool_text_right_files_layer1_layout)
+
+                                   # Text
+        self.atext_right_layer1 = QTextEdit()
+        self.atext_right_layer1.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_right_layer1.setFont(self.font)
+        self.atext_right_layer1.setFontPointSize(18)
+
+        self.atooltext_right_layer1_layout = QVBoxLayout()
+        self.atooltext_right_layer1_layout.addWidget(self.atool_text_right_files_layer1)
+        self.atooltext_right_layer1_layout.addWidget(self.atext_right_layer1)
+        self.atooltext_right_layer1.setLayout(self.atooltext_right_layer1_layout)
+
+                            # Result layer1
+        self.atooltext_layer1_layout = QHBoxLayout()
+        self.atooltext_layer1_layout.addWidget(self.atooltext_left_layer1)
+        self.atooltext_layer1_layout.addWidget(self.atooltext_right_layer1)
+
+        self.azone_layer1.setLayout(self.atooltext_layer1_layout)
+
+                                # Up
+        self.atooltext_up_layer2 = QWidget()
+                                    # Toolbar for file comparison
+        self.atool_text_up_files_layer2 = QWidget()
+
+        self.atool_text_up_files_m40_layer2 = QRadioButton("-40")
+        self.atool_text_up_files_m30_layer2 = QRadioButton("-30")
+        self.atool_text_up_files_m20_layer2 = QRadioButton("-20")
+        self.atool_text_up_files_m10_layer2 = QRadioButton("-10")
+        self.atool_text_up_files_0_layer2 = QRadioButton("0")
+        self.atool_text_up_files_p10_layer2 = QRadioButton("10")
+        self.atool_text_up_files_p20_layer2 = QRadioButton("20")
+        self.atool_text_up_files_p30_layer2 = QRadioButton("30")
+        self.atool_text_up_files_p40_layer2 = QRadioButton("40")
+
+        self.atool_text_up_files_m40_layer2.hide()
+        self.atool_text_up_files_m30_layer2.hide()
+        self.atool_text_up_files_m20_layer2.hide()
+        self.atool_text_up_files_m10_layer2.hide()
+        self.atool_text_up_files_p10_layer2.hide()
+        self.atool_text_up_files_p20_layer2.hide()
+        self.atool_text_up_files_p30_layer2.hide()
+        self.atool_text_up_files_p40_layer2.hide()
+
+        self.atool_text_up_files_layer2_layout = QHBoxLayout()
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m40_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m30_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m20_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m10_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_0_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p10_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p20_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p30_layer2)
+        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p40_layer2)
+
+        self.atool_text_up_files_layer2.setLayout(self.atool_text_up_files_layer2_layout)
+
+                                    # Text
+        self.atext_up_layer2 = QTextEdit()
+        self.atext_up_layer2.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_up_layer2.setFont(self.font)
+        self.atext_up_layer2.setFontPointSize(18)
+
+        self.atooltext_up_layer2_layout = QVBoxLayout()
+        self.atooltext_up_layer2_layout.addWidget(self.atool_text_up_files_layer2)
+        self.atooltext_up_layer2_layout.addWidget(self.atext_up_layer2)
+        self.atooltext_up_layer2.setLayout(self.atooltext_up_layer2_layout)
+
+                                # Down
+        self.atooltext_down_layer2 = QWidget()
+                                    # Toolbar for file comparison
+        self.atool_text_down_files_layer2 = QWidget()
+
+        self.atool_text_down_files_m40_layer2 = QRadioButton("-40")
+        self.atool_text_down_files_m30_layer2 = QRadioButton("-30")
+        self.atool_text_down_files_m20_layer2 = QRadioButton("-20")
+        self.atool_text_down_files_m10_layer2 = QRadioButton("-10")
+        self.atool_text_down_files_0_layer2 = QRadioButton("0")
+        self.atool_text_down_files_p10_layer2 = QRadioButton("10")
+        self.atool_text_down_files_p20_layer2 = QRadioButton("20")
+        self.atool_text_down_files_p30_layer2 = QRadioButton("30")
+        self.atool_text_down_files_p40_layer2 = QRadioButton("40")
+
+        self.atool_text_down_files_m40_layer2.hide()
+        self.atool_text_down_files_m30_layer2.hide()
+        self.atool_text_down_files_m20_layer2.hide()
+        self.atool_text_down_files_m10_layer2.hide()
+        self.atool_text_down_files_p10_layer2.hide()
+        self.atool_text_down_files_p20_layer2.hide()
+        self.atool_text_down_files_p30_layer2.hide()
+        self.atool_text_down_files_p40_layer2.hide()
+
+        self.atool_text_down_files_layer2_layout = QHBoxLayout()
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m40_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m30_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m20_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m10_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_0_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p10_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p20_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p30_layer2)
+        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p40_layer2)
+
+        self.atool_text_down_files_layer2.setLayout(self.atool_text_down_files_layer2_layout)
+
+                                    # Text
+        self.atext_down_layer2 = QTextEdit()
+        self.atext_down_layer2.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_down_layer2.setFont(self.font)
+        self.atext_down_layer2.setFontPointSize(18)
+
+        self.atooltext_down_layer2_layout = QVBoxLayout()
+        self.atooltext_down_layer2_layout.addWidget(self.atool_text_down_files_layer2)
+        self.atooltext_down_layer2_layout.addWidget(self.atext_down_layer2)
+        self.atooltext_down_layer2.setLayout(self.atooltext_down_layer2_layout)
+
+                            # Result layer
+        self.atooltext_layer2_layout = QVBoxLayout()
+        self.atooltext_layer2_layout.addWidget(self.atooltext_up_layer2)
+        self.atooltext_layer2_layout.addWidget(self.atooltext_down_layer2)
+
+        self.azone_layer2.setLayout(self.atooltext_layer2_layout)
 
                     # Image-text layout and widget
         self.aimagetext_hlayout = QHBoxLayout()
         self.aimagetext_vlayout = QVBoxLayout()
 
         self.aimagetext_vlayout.addWidget(self.ascan_image_layer1)
-        self.aimagetext_vlayout.addWidget(self.atext_layer1)
+        self.aimagetext_vlayout.addWidget(self.azone_layer1)
 
         self.aimagetext_hlayout.addWidget(self.ascan_image_layer2)
-        self.aimagetext_hlayout.addWidget(self.atext_layer2)
+        self.aimagetext_hlayout.addWidget(self.azone_layer2)
 
         self.aimagetext_widget = QWidget()
         self.aimagetext_vwidget = QWidget()
@@ -617,7 +817,6 @@ class NamselOcr(QMainWindow):
         self.ocrpage_widget = QWidget()
         self.ocrpage_widget.setLayout(self.ocr_layout)
 
-
             # Joining all the pages together
         self.page_widget = QWidget()
         self.page_staklayout = QStackedLayout(self.page_widget)
@@ -651,6 +850,47 @@ class NamselOcr(QMainWindow):
         self.abook_button.toggled.connect(self.pechabook)
         self.adouble_page.toggled.connect(self.double)
         self.arun_button.released.connect(self.autoRun)
+
+        self.atool_text_left_files_m40_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-40", x))
+        self.atool_text_left_files_m30_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-30", x))
+        self.atool_text_left_files_m20_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-20", x))
+        self.atool_text_left_files_m10_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-10", x))
+        self.atool_text_left_files_0_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "0", x))
+        self.atool_text_left_files_p10_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "10", x))
+        self.atool_text_left_files_p20_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "20", x))
+        self.atool_text_left_files_p30_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "30", x))
+        self.atool_text_left_files_p40_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "40", x))
+
+        self.atool_text_right_files_m40_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-40", x))
+        self.atool_text_right_files_m30_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-30", x))
+        self.atool_text_right_files_m20_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-20", x))
+        self.atool_text_right_files_m10_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-10", x))
+        self.atool_text_right_files_0_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "0", x))
+        self.atool_text_right_files_p10_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "10", x))
+        self.atool_text_right_files_p20_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "20", x))
+        self.atool_text_right_files_p30_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "30", x))
+        self.atool_text_right_files_p40_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "40", x))
+
+        self.atool_text_up_files_m40_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-40", x))
+        self.atool_text_up_files_m30_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-30", x))
+        self.atool_text_up_files_m20_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-20", x))
+        self.atool_text_up_files_m10_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-10", x))
+        self.atool_text_up_files_0_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "0", x))
+        self.atool_text_up_files_p10_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "10", x))
+        self.atool_text_up_files_p20_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "20", x))
+        self.atool_text_up_files_p30_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "30", x))
+        self.atool_text_up_files_p40_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "40", x))
+
+        self.atool_text_down_files_m40_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-40", x))
+        self.atool_text_down_files_m30_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-30", x))
+        self.atool_text_down_files_m20_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-20", x))
+        self.atool_text_down_files_m10_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-10", x))
+        self.atool_text_down_files_0_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "0", x))
+        self.atool_text_down_files_p10_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "10", x))
+        self.atool_text_down_files_p20_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "20", x))
+        self.atool_text_down_files_p30_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "30", x))
+        self.atool_text_down_files_p40_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "40", x))
+
             # Preprocess mode
         self.prep_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.preprocesspage_widget))
         self.pslider.valueChanged.connect(self.plcd.display)
@@ -664,6 +904,13 @@ class NamselOcr(QMainWindow):
         self.orun_button.released.connect(self.ocrRun)
             # Docker
         docker.docker_process.finished.connect(self.processFinished)
+
+    def comparison(self, pos, button, e):
+        if e:
+            self.scan_image_name_temp = button + "_ocr_output.txt"
+            with open(self.scan_image_name_temp, "r", encoding="utf-8") as file:
+                data = file.read()
+            pos.setText(data)
 
     def pechabook(self, e):
         if e:
@@ -826,28 +1073,83 @@ class NamselOcr(QMainWindow):
             self.wait()
 
     def autoRun(self):
-        if (self.aetat == "" or self.aetat == "Ocr") and self.petat != "Scan":
+        if self.aetat == "Ocr" or self.aetat == "" and self.petat != "Scan":
             self.openScanImage()
 
         if self.dialog_etat and self.aetat != "Result":
             if len(self.athreshold) == 1:
                 if self.achoice_m40.isChecked():
                     self.athreshold.append(-40)
+                    self.atool_text_left_files_m40_layer1.show()
+                    self.atool_text_right_files_m40_layer1.show()
+                    self.atool_text_up_files_m40_layer2.show()
+                    self.atool_text_down_files_m40_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_m40_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_m40_layer2
+                    
                 if self.achoice_m30.isChecked():
                     self.athreshold.append(-30)
+                    self.atool_text_left_files_m30_layer1.show()
+                    self.atool_text_right_files_m30_layer1.show()
+                    self.atool_text_up_files_m30_layer2.show()
+                    self.atool_text_down_files_m30_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_m30_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_m30_layer2
+                    
                 if self.achoice_m20.isChecked():
                     self.athreshold.append(-20)
+                    self.atool_text_left_files_m20_layer1.show()
+                    self.atool_text_right_files_m20_layer1.show()
+                    self.atool_text_up_files_m20_layer2.show()
+                    self.atool_text_down_files_m20_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_m20_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_m20_layer2
+                    
                 if self.achoice_m10.isChecked():
                     self.athreshold.append(-10)
+                    self.atool_text_left_files_m10_layer1.show()
+                    self.atool_text_right_files_m10_layer1.show()
+                    self.atool_text_up_files_m10_layer2.show()
+                    self.atool_text_down_files_m10_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_m10_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_m10_layer2
+                    
                 if self.achoice_p10.isChecked():
                     self.athreshold.append(10)
+                    self.atool_text_left_files_p10_layer1.show()
+                    self.atool_text_right_files_p10_layer1.show()
+                    self.atool_text_up_files_p10_layer2.show()
+                    self.atool_text_down_files_p10_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_p10_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_p10_layer2
+                    
                 if self.achoice_p20.isChecked():
                     self.athreshold.append(20)
+                    self.atool_text_left_files_p20_layer1.show()
+                    self.atool_text_right_files_p20_layer1.show()
+                    self.atool_text_up_files_p20_layer2.show()
+                    self.atool_text_down_files_p20_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_p20_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_p20_layer2
+                    
                 if self.achoice_p30.isChecked():
                     self.athreshold.append(30)
+                    self.atool_text_left_files_p30_layer1.show()
+                    self.atool_text_right_files_p30_layer1.show()
+                    self.atool_text_up_files_p30_layer2.show()
+                    self.atool_text_down_files_p30_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_p30_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_p30_layer2
+                    
                 if self.achoice_p40.isChecked():
                     self.athreshold.append(40)
-
+                    self.atool_text_left_files_p40_layer1.show()
+                    self.atool_text_right_files_p40_layer1.show()
+                    self.atool_text_up_files_p40_layer2.show()
+                    self.atool_text_down_files_p40_layer2.show()
+                    self.atext2_right_layer1 = self.atool_text_right_files_p40_layer1
+                    self.atext2_down_layer2 = self.atool_text_down_files_p40_layer2
+                    
             if self.petat == "Scan":
                 self.scan_image_name_temp = QFileInfo(self.scan_image_name).fileName()
                 self.scan_image_filename = str(self.athreshold[self.aloop]) + "_" + self.scan_image_name_temp
@@ -890,9 +1192,6 @@ class NamselOcr(QMainWindow):
         self.progress.show()
 
     def processFinished(self):
-        self.arg = {"threshold": "", "layout": "",
-                    "page_type": "pecha", "line_break_method": "line_cluster", \
-                    "clear_hr": "", "low_ink": "", "break_width": ""}
         if docker.etat == "Preprocess":
             if os.path.isdir(os.path.join(".", "out")) and os.path.isfile(os.path.join(".", "out", self.scan_image_filename)):
                 self.primage = QPixmap(os.path.join(".", "out", self.scan_image_filename))
@@ -920,38 +1219,63 @@ class NamselOcr(QMainWindow):
 
         elif docker.etat == "AutoPreprocess":
             if os.path.isdir(os.path.join(".", "out")) and os.path.isfile(os.path.join(".", "out", self.scan_image_filename)):
-                self.del_files()
+                os.remove(self.scan_image_filename)
 
-            if self.aloop == len(self.athreshold)-1:
-                self.aetat = "Result"
-            else:
-                self.aloop += 1
-                self.aetat = "Scan"
-
+            self.aetat = "Result"
             docker.endProcess()
-
             self.autoRun()
             return
 
         elif docker.etat == "AutoOcr":
-            self.copyFile2Qtext()
-            self.aloop = 0
-            self.aetat = "Ocr"
+            self.copyOutput()
+
+            if self.aloop == len(self.athreshold)-1:
+                self.aloop = 0
+                self.aetat = "Ocr"
+                self.copyFile2QtextAuto()
+            else:
+                self.aloop += 1
+                self.aetat = "Scan"
+                docker.endProcess()
+                self.autoRun()
+                return
 
         docker.endProcess()
         self.progress.cancel()
+        self.arg = {"threshold": "", "layout": "",
+                    "page_type": "pecha", "line_break_method": "line_cluster", \
+                    "clear_hr": "", "low_ink": "", "break_width": ""}
 
     def copyFile2Qtext(self):
         with open("ocr_output.txt", "r", encoding="utf-8") as file:
             data = file.read()
         self.otext_layer1.setText(data)
         self.otext_layer2.setText(data)
-        self.atext_layer1.setText(data)
-        self.atext_layer2.setText(data)
         self.otext_layer1.show()
         self.otext_layer2.show()
-        self.atext_layer1.show()
-        self.atext_layer2.show()
+
+    def copyOutput(self):
+        copy("ocr_output.txt", str(self.arg["threshold"]) + "_ocr_output.txt")
+        self.del_out_dir()
+
+    def copyFile2QtextAuto(self):
+        with open("0_ocr_output.txt", "r", encoding="utf-8") as file:
+            data = file.read()
+        self.atext_left_layer1.setText(data)
+        self.atext_up_layer2.setText(data)
+        self.atool_text_left_files_0_layer1.setChecked(True)
+        self.atool_text_up_files_0_layer2.setChecked(True)
+
+        if len(self.athreshold) > 1:
+            with open(str(self.arg["threshold"]) + "_ocr_output.txt", "r", encoding="utf-8") as file:
+                data = file.read()
+            self.atext_right_layer1.setText(data)
+            self.atext_down_layer2.setText(data)
+            self.atext2_right_layer1.setChecked(True)
+            self.atext2_down_layer2.setChecked(True)
+
+        self.azone_layer1.show()
+        self.azone_layer2.show()
 
     def lang(self, e):
         global lang
