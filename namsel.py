@@ -650,26 +650,26 @@ class NamselOcr(QMainWindow):
             # Auto mode
         self.auto_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.autopage_widget))
         self.adial.valueChanged.connect(lambda x: self.alcd.display(x / 2) if x else self.alcd.display("Off"))
-        self.abook_button.toggled.connect(self.book)
+        self.abook_button.toggled.connect(self.pechabook)
         self.adouble_page.toggled.connect(self.double)
         self.arun_button.released.connect(self.autoRun)
             # Preprocess mode
         self.prep_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.preprocesspage_widget))
         self.pslider.valueChanged.connect(self.plcd.display)
-        self.pbook_button.toggled.connect(self.book)
+        self.pbook_button.toggled.connect(self.pechabook)
         self.pdouble_page.toggled.connect(self.double)
         self.prun_button.released.connect(self.preprocessRun)
             # Ocr mode
         self.ocr_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.ocrpage_widget))
         self.odial.valueChanged.connect(lambda x: self.olcd.display(x/2) if x else self.olcd.display("Off"))
-        self.obook_button.toggled.connect(self.book)
+        self.obook_button.toggled.connect(self.pechabook)
         self.orun_button.released.connect(self.ocrRun)
             # Docker
         docker.docker_process.finished.connect(self.processFinished)
 
-    def book(self, e):
+    def pechabook(self, e):
         if e:
-            if not self.pdouble_page.isChecked() or not self.adouble_page.isChecked():
+            if not self.pdouble_page.isChecked() and not self.adouble_page.isChecked():
                 self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
                 self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
 
@@ -687,6 +687,7 @@ class NamselOcr(QMainWindow):
         else:
             self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
+            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
             self.pd_widget.hide()
             self.od_widget.hide()
             self.adc_widget.hide()
@@ -787,16 +788,25 @@ class NamselOcr(QMainWindow):
                         while True:
                             ack = copy(os.path.join(self.scan_folder_name, f), work_directory)
                             if ack.find(f): break
-                self.pvolume = False
 
             if self.pslider.value():
                 self.arg["threshold"] = self.pslider.value()
+            else:
+                self.arg["threshold"] = 0
             if self.pdouble_page.isChecked():
                 self.arg["layout"] = "double"
 
             docker.etat = "Preprocess"
             docker.preprocess(self.arg)
-            self.wait()
+
+            self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
+
+            if self.pvolume:
+                txt = self.scan_folder_name + "\n\n" + "Thickness: " + str(self.arg["threshold"])
+                self.pvolume = False
+            else:
+                txt = self.scan_image_filename + "\n\n" + "Thickness: " + str(self.arg["threshold"])
+            self.wait(txt)
 
     def ocrRun(self):
         if self.petat == "" or self.oetat == "Ocr":
@@ -841,7 +851,8 @@ class NamselOcr(QMainWindow):
                     self.athreshold.append(40)
 
             if self.petat == "Scan":
-                self.scan_image_filename = str(self.athreshold[self.aloop])+"_"+QFileInfo(self.scan_image_name).fileName()
+                self.scan_image_name_temp = QFileInfo(self.scan_image_name).fileName()
+                self.scan_image_filename = str(self.athreshold[self.aloop]) + "_" + self.scan_image_name_temp
                 copy(self.scan_image_name, os.path.join(work_directory, self.scan_image_filename))
 
                 if self.adouble_page.isChecked(): self.arg["layout"] = "double"
@@ -851,7 +862,7 @@ class NamselOcr(QMainWindow):
 
                 docker.etat = "AutoPreprocess"
                 docker.preprocess(self.arg)
-                self.wait("Thickness: "+str(self.arg["threshold"]))
+                self.wait(self.scan_image_name_temp + "\n\n" + "Thickness: " + str(self.arg["threshold"]))
 
         elif self.aetat == "Result":
             if self.abook_button.isChecked():
@@ -885,7 +896,6 @@ class NamselOcr(QMainWindow):
                     "page_type": "pecha", "line_break_method": "line_cluster", \
                     "clear_hr": "", "low_ink": "", "break_width": ""}
         if docker.etat == "Preprocess":
-            self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
             if os.path.isdir(os.path.join(".", "out")) and os.path.isfile(os.path.join(".", "out", self.scan_image_filename)):
                 self.primage = QPixmap(os.path.join(".", "out", self.scan_image_filename))
                 self.presult_image_layer1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
