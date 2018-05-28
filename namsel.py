@@ -18,7 +18,6 @@ languages = {
 lang = languages["en"]
 work_directory = os.path.join(gettempdir(), "namsel")
 
-
 def setEnvironment():
     global docker
 
@@ -86,7 +85,6 @@ class NamselOcr(QMainWindow):
         self.petat = self.oetat = self.aetat = ""
         self.pvolume = False
         self.aloop = 0
-        #self.athreshold = [-20, -10, 0, +10, +20]
         self.athreshold = [0]
 
         # Title
