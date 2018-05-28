@@ -16,8 +16,8 @@ languages = {
     "zh_TW":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["zht"])
 }
 lang = languages["en"]
-work_directory = gettempdir() + "/namsel"
-docker = ""
+work_directory = os.path.join(gettempdir(), "namsel")
+
 
 def setEnvironment():
     global docker
@@ -51,6 +51,7 @@ class Docker(object):
         print(lang.gettext("Docker Namsel Ocr is now running!\n"))
 
     def preprocess(self, arg={}):
+        arg["page_type"] = arg ["line_break_method"] = ""
         self.exec(text="Preprocess is running...", param="preprocess", arg=arg)
 
     def ocr(self, arg={}):
@@ -59,6 +60,7 @@ class Docker(object):
     def exec(self, text="", param="", arg={}):
         arg = " " + " ".join(["--" + k + " " + str(v) for k, v in arg.items() if v])
         print(lang.gettext("\n" + text))
+        #print(arg)
         self.docker_process.start("docker exec namsel-ocr ./namsel-ocr " + param + arg)
 
     def stop(self):
@@ -83,6 +85,9 @@ class NamselOcr(QMainWindow):
                         "clear_hr":"", "low_ink":"", "break_width":""}
         self.petat = self.oetat = self.aetat = ""
         self.pvolume = False
+        self.aloop = 0
+        #self.athreshold = [-20, -10, 0, +10, +20]
+        self.athreshold = [0]
 
         # Title
         self.setWindowTitle(lang.gettext("Namsel Ocr"))
@@ -206,6 +211,44 @@ class NamselOcr(QMainWindow):
         self.alowink_group = QGroupBox()
         self.alowink_group.setLayout(self.alowink_layout)
 
+                        # Choice
+        self.achoice_m40 = QCheckBox(lang.gettext("-40"))
+        self.achoice_m30 = QCheckBox(lang.gettext("-30"))
+        self.achoice_m20 = QCheckBox(lang.gettext("-20"))
+        self.achoice_m10 = QCheckBox(lang.gettext("-10"))
+        self.achoice_0 = QCheckBox(lang.gettext("0"))
+        self.achoice_p10 = QCheckBox(lang.gettext("+10"))
+        self.achoice_p20 = QCheckBox(lang.gettext("+20"))
+        self.achoice_p30 = QCheckBox(lang.gettext("+30"))
+        self.achoice_p40 = QCheckBox(lang.gettext("+40"))
+
+        self.achoice_m40.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -40"))
+        self.achoice_m30.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -30"))
+        self.achoice_m20.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -20"))
+        self.achoice_m10.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -10"))
+        self.achoice_0.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 0"))
+        self.achoice_p10.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 10"))
+        self.achoice_p20.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 20"))
+        self.achoice_p30.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 30"))
+        self.achoice_p40.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 40"))
+
+        self.achoice_0.setDisabled(True)
+        self.achoice_0.setChecked(True)
+
+        self.achoice_layout = QHBoxLayout()
+        self.achoice_layout.addWidget(self.achoice_m40)
+        self.achoice_layout.addWidget(self.achoice_m30)
+        self.achoice_layout.addWidget(self.achoice_m20)
+        self.achoice_layout.addWidget(self.achoice_m10)
+        self.achoice_layout.addWidget(self.achoice_0)
+        self.achoice_layout.addWidget(self.achoice_p10)
+        self.achoice_layout.addWidget(self.achoice_p20)
+        self.achoice_layout.addWidget(self.achoice_p30)
+        self.achoice_layout.addWidget(self.achoice_p40)
+
+        self.achoice_group = QGroupBox()
+        self.achoice_group.setLayout(self.achoice_layout)
+
                         # Label and the dial value
         self.adialabel_val = QLabel(lang.gettext("Break width: "))
         self.alcd = QLCDNumber()
@@ -261,6 +304,7 @@ class NamselOcr(QMainWindow):
         self.aoption_layout = QHBoxLayout()
         self.aoption_layout.addWidget(self.apecha_book_group)
         self.aoption_layout.addWidget(self.alowink_group)
+        self.aoption_layout.addWidget(self.achoice_group)
         self.aoption_layout.addWidget(self.adial_group)
         self.aoption_layout.addWidget(self.arun_group)
 
@@ -778,16 +822,36 @@ class NamselOcr(QMainWindow):
             self.openScanImage()
 
         if self.dialog_etat and self.aetat != "Result":
+            if len(self.athreshold) == 1:
+                if self.achoice_m40.isChecked():
+                    self.athreshold.append(-40)
+                if self.achoice_m30.isChecked():
+                    self.athreshold.append(-30)
+                if self.achoice_m20.isChecked():
+                    self.athreshold.append(-20)
+                if self.achoice_m10.isChecked():
+                    self.athreshold.append(-10)
+                if self.achoice_p10.isChecked():
+                    self.athreshold.append(10)
+                if self.achoice_p20.isChecked():
+                    self.athreshold.append(20)
+                if self.achoice_p30.isChecked():
+                    self.athreshold.append(30)
+                if self.achoice_p40.isChecked():
+                    self.athreshold.append(40)
+
             if self.petat == "Scan":
-                copy(self.scan_image_name, work_directory)
+                self.scan_image_filename = str(self.athreshold[self.aloop])+"_"+QFileInfo(self.scan_image_name).fileName()
+                copy(self.scan_image_name, os.path.join(work_directory, self.scan_image_filename))
 
                 if self.adouble_page.isChecked(): self.arg["layout"] = "double"
+                self.arg["threshold"] = self.athreshold[self.aloop]
 
                 self.aetat = "Scan"
 
                 docker.etat = "AutoPreprocess"
                 docker.preprocess(self.arg)
-                self.wait()
+                self.wait("Thickness: "+str(self.arg["threshold"]))
 
         elif self.aetat == "Result":
             if self.abook_button.isChecked():
@@ -799,14 +863,19 @@ class NamselOcr(QMainWindow):
 
             docker.etat = "AutoOcr"
             docker.ocr(self.arg)
+            self.wait()
 
-    def wait(self):
+    def wait(self, text=""):
         if docker.etat == "Preprocess":
             label = lang.gettext("Preprocess is running...")
         elif docker.etat == "Ocr":
             label = lang.gettext("Ocr is running...")
         elif docker.etat == "AutoPreprocess":
-            label = lang.gettext("Autoprocess is running...")
+            label = lang.gettext("Auto preprocess is running...")
+        elif docker.etat == "AutoOcr":
+            label = lang.gettext("Auto Ocr is running...")
+
+        if text: label += "\n\n"+text
 
         self.progress.setLabelText(label)
         self.progress.show()
@@ -842,16 +911,23 @@ class NamselOcr(QMainWindow):
             self.oetat = "Ocr"
 
         elif docker.etat == "AutoPreprocess":
-            self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
             if os.path.isdir(os.path.join(".", "out")) and os.path.isfile(os.path.join(".", "out", self.scan_image_filename)):
                 self.del_files()
-            self.aetat = "Result"
+
+            if self.aloop == len(self.athreshold)-1:
+                self.aetat = "Result"
+            else:
+                self.aloop += 1
+                self.aetat = "Scan"
+
             docker.endProcess()
+
             self.autoRun()
             return
 
         elif docker.etat == "AutoOcr":
             self.copyFile2Qtext()
+            self.aloop = 0
             self.aetat = "Ocr"
 
         docker.endProcess()
