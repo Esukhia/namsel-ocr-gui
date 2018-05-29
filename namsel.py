@@ -8,15 +8,27 @@ import os, sys
 
 import gettext
 
+# Sharing folders with PyInstaller
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 languages = {
-    "bo":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["bo"]),
-    "en":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["en"]),
-    "fr":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["fr"]),
-    "zh_CN":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["zhs"]),
-    "zh_TW":gettext.translation("namsel-ocr-gui", localedir="locales", languages=["zht"])
+    "bo":gettext.translation("namsel-ocr-gui", localedir=resource_path("locales"), languages=["bo"]),
+    "en":gettext.translation("namsel-ocr-gui", localedir=resource_path("locales"), languages=["en"]),
+    "fr":gettext.translation("namsel-ocr-gui", localedir=resource_path("locales"), languages=["fr"]),
+    "zh_CN":gettext.translation("namsel-ocr-gui", localedir=resource_path("locales"), languages=["zhs"]),
+    "zh_TW":gettext.translation("namsel-ocr-gui", localedir=resource_path("locales"), languages=["zht"])
 }
 lang = languages["en"]
 work_directory = os.path.join(gettempdir(), "namsel")
+print("\nWorking directory: %s" % work_directory)
 
 def setEnvironment():
     global docker
@@ -37,7 +49,7 @@ class Docker(object):
         self.docker_process = QProcess()
 
         if "\\" in work_directory:
-            docker_namsel_path = "////" + work_directory.replace("\\", "/").replace(":/", "/")
+            docker_namsel_path = "/" + work_directory[:1].lower()+work_directory[1:].replace("\\", "/").replace(":/", "/")
 
         self.etat = "Init"
         print(lang.gettext("\nRunning the container..."))
@@ -1193,7 +1205,7 @@ class NamselOcr(QMainWindow):
 
     def processFinished(self):
         if docker.etat == "Preprocess":
-            if os.path.isdir(os.path.join(".", "out")) and os.path.isfile(os.path.join(".", "out", self.scan_image_filename)):
+            if os.path.isdir(os.path.join(work_directory, "out")) and os.path.isfile(os.path.join(work_directory, "out", self.scan_image_filename)):
                 self.primage = QPixmap(os.path.join(".", "out", self.scan_image_filename))
                 self.presult_image_layer1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
                 self.presult_image_layer2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
@@ -1218,7 +1230,7 @@ class NamselOcr(QMainWindow):
             self.oetat = "Ocr"
 
         elif docker.etat == "AutoPreprocess":
-            if os.path.isdir(os.path.join(".", "out")) and os.path.isfile(os.path.join(".", "out", self.scan_image_filename)):
+            if os.path.isdir(os.path.join(work_directory, "out")) and os.path.isfile(os.path.join(work_directory, "out", self.scan_image_filename)):
                 os.remove(self.scan_image_filename)
 
             self.aetat = "Result"
