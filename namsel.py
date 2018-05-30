@@ -6,6 +6,8 @@ from shutil import copy, rmtree
 from tempfile import gettempdir
 import os, sys
 
+import re
+
 import gettext
 
 import docx
@@ -145,6 +147,8 @@ class NamselOcr(QMainWindow):
         self.prep_subaction.setStatusTip(lang.gettext("open the preprocess mode window"))
         self.ocr_subaction = QAction(lang.gettext("Ocr mode"), self)
         self.ocr_subaction.setStatusTip(lang.gettext("open the ocr mode window"))
+        self.convert_subaction = QAction(lang.gettext("Convert mode"), self)
+        self.convert_subaction.setStatusTip(lang.gettext("Convert the result file to a final clean state."))
         self.auto_subaction.setCheckable(True)
         self.prep_subaction.setCheckable(True)
         self.ocr_subaction.setCheckable(True)
@@ -261,14 +265,13 @@ class NamselOcr(QMainWindow):
         self.achoice_layout.addWidget(self.achoice_p40)
 
         self.achoice_group = QGroupBox()
-        self.achoice_group.setFixedHeight(120)
+        self.achoice_group.setFixedHeight(100)
         self.achoice_group.setLayout(self.achoice_layout)
 
                                 # Switch Buttons
-        self.amanual_button1 = QPushButton("Manual")
+        self.amanual_button1 = QPushButton(lang.gettext("Manual"))
+        self.amanual_button1.setStatusTip(lang.gettext("Switch to Manual settings"))
         self.amanual_button1.setFixedWidth(100)
-        self.amanual_button2 = QPushButton("Auto")
-        self.amanual_button2.setFixedWidth(100)
 
                             # All together
         self.amanual_layer1 = QVBoxLayout()
@@ -309,11 +312,12 @@ class NamselOcr(QMainWindow):
         self.aslider_place.setLayout(self.aslider_layout)
 
         self.amanual_slider_group = QGroupBox()
-        self.amanual_slider_group.setFixedHeight(120)
+        self.amanual_slider_group.setFixedHeight(100)
         self.amanual_slider_group.setLayout(self.aslider_layout)
 
                                 # Switch Buttons
-        self.amanual_button2 = QPushButton("Auto")
+        self.amanual_button2 = QPushButton(lang.gettext("Auto"))
+        self.amanual_button2.setStatusTip(lang.gettext("Switch to Auto settings"))
         self.amanual_button2.setFixedWidth(100)
 
                             # All together
@@ -393,7 +397,7 @@ class NamselOcr(QMainWindow):
         self.aoption_layout.addWidget(self.arun_group)
 
         self.aoption_widget = QWidget()
-        self.aoption_widget.setFixedHeight(200)
+        self.aoption_widget.setFixedHeight(160)
         self.aoption_widget.setLayout(self.aoption_layout)
 
                     # Image-text
@@ -403,11 +407,9 @@ class NamselOcr(QMainWindow):
         self.ascan_image_layer1.setStatusTip(lang.gettext("The scan image"))
         self.ascan_image_layer2.setStatusTip(lang.gettext("The scan image"))
 
-                        # Result text widget
-        self.azone_layer1 = QWidget()
-        self.azone_layer2 = QWidget()
-        self.azone_layer1.hide()
-        self.azone_layer2.hide()
+                        # Result text widget & layout
+        self.azone_layer1_place = QWidget()
+        self.azone_layer2_place = QWidget()
 
                                 # Left
         self.atooltext_left_layer1 = QWidget()
@@ -510,7 +512,7 @@ class NamselOcr(QMainWindow):
         self.atooltext_layer1_layout.addWidget(self.atooltext_left_layer1)
         self.atooltext_layer1_layout.addWidget(self.atooltext_right_layer1)
 
-        self.azone_layer1.setLayout(self.atooltext_layer1_layout)
+        self.azone_layer1_place.setLayout(self.atooltext_layer1_layout)
 
                                 # Up
         self.atooltext_up_layer2 = QWidget()
@@ -608,59 +610,128 @@ class NamselOcr(QMainWindow):
         self.atooltext_down_layer2_layout.addWidget(self.atext_down_layer2)
         self.atooltext_down_layer2.setLayout(self.atooltext_down_layer2_layout)
 
-
-        self.atext_alayer1 = QTextEdit()
-        self.atext_alayer1.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_alayer1.setFont(self.font)
-        self.atext_alayer1.setFontPointSize(18)
-        self.atext_alayer1.hide()
-
-        self.atext_alayer2 = QTextEdit()
-        self.atext_alayer2.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_alayer2.setFont(self.font)
-        self.atext_alayer2.setFontPointSize(18)
-        self.atext_alayer2.hide()
-
-        # Result layer
+                            # Result layer2
         self.atooltext_layer2_layout = QVBoxLayout()
         self.atooltext_layer2_layout.addWidget(self.atooltext_up_layer2)
         self.atooltext_layer2_layout.addWidget(self.atooltext_down_layer2)
 
-        self.azone_layer2.setLayout(self.atooltext_layer2_layout)
+        self.azone_layer2_place.setLayout(self.atooltext_layer2_layout)
+
+                            # Auto manual mode
+                                # Layer1
+                                    # Toolbar
+        self.atool_atext_copy1 = QPushButton(lang.gettext("Copy"))
+        self.atool_atext_copy1.setStatusTip(lang.gettext("Copy to Clipboard"))
+        self.atool_atext_copy1.setFixedWidth(100)
+        self.atool_atext_paste1 = QPushButton(lang.gettext("Paste"))
+        self.atool_atext_paste1.setStatusTip(lang.gettext("Paste from Clipboard"))
+        self.atool_atext_paste1.setFixedWidth(100)
+        self.atool_atext_clean1 = QPushButton(lang.gettext("Clean"))
+        self.atool_atext_clean1.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
+        self.atool_atext_clean1.setFixedWidth(100)
+        self.atool_atext_docx1 = QPushButton(lang.gettext("(.docx)"))
+        self.atool_atext_docx1.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
+        self.atool_atext_docx1.setFixedWidth(100)
+
+        self.atool_atext_group_layer1 = QHBoxLayout()
+        self.atool_atext_group_layer1.addWidget(self.atool_atext_copy1)
+        self.atool_atext_group_layer1.addWidget(self.atool_atext_clean1)
+        self.atool_atext_group_layer1.addWidget(self.atool_atext_paste1)
+        self.atool_atext_group_layer1.addWidget(self.atool_atext_docx1)
+        self.atool_atext_group1 = QGroupBox()
+        self.atool_atext_group1.setLayout(self.atool_atext_group_layer1)
+                                
+                                    # QTextEdit
+        self.atext_alayer1 = QTextEdit()
+        self.atext_alayer1.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_alayer1.setFont(self.font)
+        self.atext_alayer1.setFontPointSize(18)
+
+                                # Put together
+        self.atool_atext_layer1 = QVBoxLayout()
+        self.atool_atext_layer1.addWidget(self.atool_atext_group1)
+        self.atool_atext_layer1.addWidget(self.atext_alayer1)
+
+        self.atext_tool_alayer1 = QWidget()
+        self.atext_tool_alayer1.setLayout(self.atool_atext_layer1)
+
+                                # Layer2
+                                    # Toolbar
+        self.atool_atext_copy2 = QPushButton(lang.gettext("Copy"))
+        self.atool_atext_copy2.setStatusTip(lang.gettext("Copy to Clipboard"))
+        self.atool_atext_copy2.setFixedWidth(100)
+        self.atool_atext_paste2 = QPushButton(lang.gettext("Paste"))
+        self.atool_atext_paste2.setStatusTip(lang.gettext("Paste from Clipboard"))
+        self.atool_atext_paste2.setFixedWidth(100)
+        self.atool_atext_clean2 = QPushButton(lang.gettext("Clean"))
+        self.atool_atext_clean2.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
+        self.atool_atext_clean2.setFixedWidth(100)
+        self.atool_atext_docx2 = QPushButton(lang.gettext("(.docx)"))
+        self.atool_atext_docx2.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
+        self.atool_atext_docx2.setFixedWidth(100)
+
+        self.atool_atext_group_layer2 = QHBoxLayout()
+        self.atool_atext_group_layer2.addWidget(self.atool_atext_copy2)
+        self.atool_atext_group_layer2.addWidget(self.atool_atext_clean2)
+        self.atool_atext_group_layer2.addWidget(self.atool_atext_paste2)
+        self.atool_atext_group_layer2.addWidget(self.atool_atext_docx2)
+        self.atool_atext_group2 = QGroupBox()
+        self.atool_atext_group2.setLayout(self.atool_atext_group_layer2)
+
+                                    # QTextEdit
+        self.atext_alayer2 = QTextEdit()
+        self.atext_alayer2.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_alayer2.setFont(self.font)
+        self.atext_alayer2.setFontPointSize(18)
+
+                                # Put together
+        self.atool_atext_layer2 = QVBoxLayout()
+        self.atool_atext_layer2.addWidget(self.atool_atext_group2)
+        self.atool_atext_layer2.addWidget(self.atext_alayer2)
+
+        self.atext_tool_alayer2 = QWidget()
+        self.atext_tool_alayer2.setLayout(self.atool_atext_layer2)
+
+        self.azone_layer1_place1 = QWidget()
+
+        self.azone_layer1_staklayout = QStackedLayout(self.azone_layer1_place1)
+        self.azone_layer1_staklayout.addWidget(self.azone_layer1_place)
+        self.azone_layer1_staklayout.addWidget(self.atext_tool_alayer1)
+        self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
+
+        self.azone_layer1_place1.setLayout(self.azone_layer1_staklayout)
+        self.atext_tool_alayer1.hide()
+        self.azone_layer1_place.hide()
+
+        self.azone_layer2_place1 = QWidget()
+
+        self.azone_layer2_staklayout = QStackedLayout(self.azone_layer2_place1)
+        self.azone_layer2_staklayout.addWidget(self.azone_layer2_place)
+        self.azone_layer2_staklayout.addWidget(self.atext_tool_alayer2)
+        self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
+
+        self.azone_layer2_place1.setLayout(self.azone_layer1_staklayout)
+        self.atext_tool_alayer2.hide()
+        self.azone_layer2_place.hide()
 
                     # Image-text layout and widget
-        self.aimagetext_hlayout = QHBoxLayout()
-        self.aimagetext_vlayout = QVBoxLayout()
         self.aimagetext_ahlayout = QHBoxLayout()
         self.aimagetext_avlayout = QVBoxLayout()
 
-        self.aimagetext_vlayout.addWidget(self.ascan_image_layer1)
-        self.aimagetext_vlayout.addWidget(self.azone_layer1)
-
-        self.aimagetext_hlayout.addWidget(self.ascan_image_layer2)
-        self.aimagetext_hlayout.addWidget(self.azone_layer2)
-
         self.aimagetext_avlayout.addWidget(self.ascan_image_layer1)
-        self.aimagetext_avlayout.addWidget(self.atext_alayer1)
+        self.aimagetext_avlayout.addWidget(self.azone_layer1_place1)
 
         self.aimagetext_ahlayout.addWidget(self.ascan_image_layer2)
-        self.aimagetext_ahlayout.addWidget(self.atext_alayer2)
+        self.aimagetext_ahlayout.addWidget(self.azone_layer2_place1)
 
         self.aimagetext_widget = QWidget()
-        self.aimagetext_vwidget = QWidget()
-        self.aimagetext_hwidget = QWidget()
         self.aimagetext_ahwidget = QWidget()
         self.aimagetext_avwidget = QWidget()
-
-        self.aimagetext_vwidget.setLayout(self.aimagetext_vlayout)
-        self.aimagetext_hwidget.setLayout(self.aimagetext_hlayout)
 
         self.aimagetext_avwidget.setLayout(self.aimagetext_avlayout)
         self.aimagetext_ahwidget.setLayout(self.aimagetext_ahlayout)
 
         self.aimagetext_staklayout = QStackedLayout(self.aimagetext_widget)
-        self.aimagetext_staklayout.addWidget(self.aimagetext_vwidget)
-        self.aimagetext_staklayout.addWidget(self.aimagetext_hwidget)
         self.aimagetext_staklayout.addWidget(self.aimagetext_ahwidget)
         self.aimagetext_staklayout.addWidget(self.aimagetext_avwidget)
         self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
@@ -747,7 +818,7 @@ class NamselOcr(QMainWindow):
         self.poption_layout.addWidget(self.prun_group)
 
         self.poption_widget = QWidget()
-        self.poption_widget.setFixedHeight(130)
+        self.poption_widget.setFixedHeight(160)
         self.poption_widget.setLayout(self.poption_layout)
 
                     # Image
@@ -877,7 +948,7 @@ class NamselOcr(QMainWindow):
         self.ooption_layout.addWidget(self.orun_group)
 
         self.ooption_widget = QWidget()
-        self.ooption_widget.setFixedHeight(130)
+        self.ooption_widget.setFixedHeight(160)
         self.ooption_widget.setLayout(self.ooption_layout)
 
                     # Image-text
@@ -1008,6 +1079,15 @@ class NamselOcr(QMainWindow):
         self.atool_text_down_files_p30_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "30", x))
         self.atool_text_down_files_p40_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "40", x))
 
+        self.atool_atext_copy1.released.connect(self.copy)
+        self.atool_atext_copy2.released.connect(self.copy)
+        self.atool_atext_clean1.released.connect(self.clean)
+        self.atool_atext_clean2.released.connect(self.clean)
+        self.atool_atext_paste1.released.connect(self.paste)
+        self.atool_atext_paste2.released.connect(self.paste)
+        self.atool_atext_docx1.released.connect(self.docx)
+        self.atool_atext_docx2.released.connect(self.docx)
+
             # Preprocess mode
         self.prep_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.preprocesspage_widget))
         self.pslider.valueChanged.connect(self.plcd.display)
@@ -1024,9 +1104,47 @@ class NamselOcr(QMainWindow):
 
     def autoManual(self):
         self.aswitch_layer.setCurrentWidget(self.amanual_place2)
+        self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
+        self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
+        if self.atext_alayer1.toPlainText() == "":
+            self.atext_tool_alayer1.hide()
+            self.atext_tool_alayer2.hide()
 
     def autoAuto(self):
         self.aswitch_layer.setCurrentWidget(self.amanual_place1)
+        self.azone_layer1_staklayout.setCurrentWidget(self.azone_layer1_place)
+        self.azone_layer2_staklayout.setCurrentWidget(self.azone_layer2_place)
+        if self.atext_left_layer1.toPlainText() == "":
+            self.azone_layer1_place.hide()
+            self.azone_layer2_place.hide()
+
+    def copy(self):
+        data = self.atext_alayer1.toPlainText()
+        QApplication.clipboard().setText(data)
+
+    def clean(self):
+        data = self.atext_alayer1.toPlainText()
+        data = re.sub(r"(OCR text\n)|(\n.*?.tif\n)|(་)\n|\n\n", r"\3", data)
+        data = re.sub(r"([ག།])\n", r"\1 ", data)
+        data = re.sub(r"(༄|.༅)", r"\n\1", data)
+        self.otext_layer1.setText(data)
+        self.otext_layer2.setText(data)
+        self.atext_alayer1.setText(data)
+        self.atext_alayer2.setText(data)
+
+    def paste(self):
+        data = QApplication.clipboard().text()
+        self.otext_layer1.setText(data)
+        self.otext_layer2.setText(data)
+        self.atext_alayer1.setText(data)
+        self.atext_alayer2.setText(data)
+
+    def docx(self):
+        data = self.atext_alayer1.toPlainText()
+        word_file = docx.Document()
+        word_file.add_paragraph(data)
+        word_file.save(os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', 'namsel-ocr.docx'))
+        del word_file
 
     def comparison(self, pos, button, e):
         if e:
@@ -1041,9 +1159,10 @@ class NamselOcr(QMainWindow):
                 self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
 
                 if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                    self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
+                    self.azone_layer1_staklayout.setCurrentWidget(self.azone_layer1_place)
                 else:
-                    self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
+                    self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
+                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
 
             if self.petat == "Result" and self.pdouble_page.isChecked():
                 self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
@@ -1061,9 +1180,10 @@ class NamselOcr(QMainWindow):
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
 
             if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
+                self.azone_layer2_staklayout.setCurrentWidget(self.azone_layer2_place)
             else:
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
+                self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
+            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
 
             self.pd_widget.hide()
             self.od_widget.hide()
@@ -1078,9 +1198,10 @@ class NamselOcr(QMainWindow):
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
 
             if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
+                self.azone_layer2_staklayout.setCurrentWidget(self.azone_layer2_place)
             else:
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
+                self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
+            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
 
             self.pdouble_page.setChecked(True)
             self.adouble_page.setChecked(True)
@@ -1089,9 +1210,10 @@ class NamselOcr(QMainWindow):
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_hwidget)
 
             if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
+                self.azone_layer1_staklayout.setCurrentWidget(self.azone_layer1_place)
             else:
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
+                self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
+            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
 
             self.pdouble_page.setChecked(False)
             self.adouble_page.setChecked(False)
@@ -1118,16 +1240,14 @@ class NamselOcr(QMainWindow):
                 self.otext_layer2.hide()
                 self.otext_layer1.clear()
                 self.otext_layer2.clear()
-                self.atext_left_layer1.hide()
-                self.atext_right_layer1.hide()
-                self.atext_up_layer2.hide()
-                self.atext_down_layer2.hide()
+                self.atext_tool_alayer1.hide()
+                self.atext_tool_alayer2.hide()
                 self.atext_left_layer1.clear()
                 self.atext_right_layer1.clear()
                 self.atext_up_layer2.clear()
                 self.atext_down_layer2.clear()
-                self.atext_alayer1.hide()
-                self.atext_alayer2.hide()
+                self.azone_layer1_place.hide()
+                self.azone_layer2_place.hide()
                 self.atext_alayer1.clear()
                 self.atext_alayer2.clear()
                 self.del_out_dir()
@@ -1222,7 +1342,6 @@ class NamselOcr(QMainWindow):
     def autoRun(self):
         if self.aetat == "Ocr" or self.aetat == "" and self.petat != "Scan":
             self.openScanImage()
-
 
         if self.dialog_etat and self.aetat != "Result":
             if self.aswitch_layer.currentWidget() == self.amanual_place1:
@@ -1402,8 +1521,8 @@ class NamselOcr(QMainWindow):
                     self.oetat = ""
 
                 if self.aetat == "Ocr":
-                    self.atext_alayer1.hide()
-                    self.atext_alayer2.hide()
+                    self.azone_layer1_place.hide()
+                    self.azone_layer2_place.hide()
                     self.atext_alayer1.clear()
                     self.atext_alayer2.clear()
                     self.aetat = ""
@@ -1459,14 +1578,8 @@ class NamselOcr(QMainWindow):
         self.otext_layer2.show()
         self.atext_alayer1.setText(data)
         self.atext_alayer2.setText(data)
-        self.atext_alayer1.show()
-        self.atext_alayer2.show()
-
-        word_file = docx.Document()
-        word_file.add_paragraph(data)
-        word_file.save(os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', 'namsel-ocr.docx'))
-        del word_file
-
+        self.atext_tool_alayer1.show()
+        self.atext_tool_alayer2.show()
 
     def copyOutput(self):
         copy("ocr_output.txt", str(self.arg["threshold"]) + "_ocr_output.txt")
@@ -1488,8 +1601,8 @@ class NamselOcr(QMainWindow):
             self.atext2_right_layer1.setChecked(True)
             self.atext2_down_layer2.setChecked(True)
 
-        self.azone_layer1.show()
-        self.azone_layer2.show()
+        self.azone_layer1_place.show()
+        self.azone_layer2_place.show()
 
     def lang(self, e):
         global lang
