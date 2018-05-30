@@ -8,6 +8,8 @@ import os, sys
 
 import gettext
 
+import docx
+
 # Sharing folders with PyInstaller
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -221,7 +223,9 @@ class NamselOcr(QMainWindow):
         self.alowink_group = QGroupBox()
         self.alowink_group.setLayout(self.alowink_layout)
 
-                        # Choice
+                        # Checks and manual
+                            # Automatic checks
+                                # Choice
         self.achoice_m40 = QCheckBox(lang.gettext("-40"))
         self.achoice_m30 = QCheckBox(lang.gettext("-30"))
         self.achoice_m20 = QCheckBox(lang.gettext("-20"))
@@ -256,39 +260,28 @@ class NamselOcr(QMainWindow):
         self.achoice_layout.addWidget(self.achoice_p30)
         self.achoice_layout.addWidget(self.achoice_p40)
 
-
-
-
         self.achoice_group = QGroupBox()
         self.achoice_group.setFixedHeight(120)
         self.achoice_group.setLayout(self.achoice_layout)
 
-
-
+                                # Switch Buttons
         self.amanual_button1 = QPushButton("Manual")
         self.amanual_button1.setFixedWidth(100)
         self.amanual_button2 = QPushButton("Auto")
         self.amanual_button2.setFixedWidth(100)
+
+                            # All together
         self.amanual_layer1 = QVBoxLayout()
-        self.amanual_layer2 = QVBoxLayout()
 
-
-
-
-
-        self.amanual_place = QWidget()
         self.amanual_place1 = QWidget()
-        self.amanual_place2 = QWidget()
 
         self.amanual_layer1.addWidget(self.achoice_group)
         self.amanual_layer1.addWidget(self.amanual_button1, 0, Qt.AlignCenter)
         self.amanual_layer1.setContentsMargins(0,0,0,0)
         self.amanual_place1.setLayout(self.amanual_layer1)
 
-
-
-
-
+                            # Manual settings
+                                # Label & Slider
         self.asliderlabel_val = QLabel(lang.gettext("Thickness: "))
         self.aslcd = QLCDNumber()
         self.aslcd.setStatusTip(lang.gettext("The thickness value during the preprocess"))
@@ -301,10 +294,6 @@ class NamselOcr(QMainWindow):
         self.aslider.setTickPosition(QSlider.TicksBelow)
         self.aslider.setTickInterval(5)
         self.aslider.setStatusTip(lang.gettext("Set the thickness of the scan image"))
-
-        
-
-
 
         self.aslider_label_place = QWidget()
         self.aslider_label_layout = QHBoxLayout()
@@ -319,39 +308,30 @@ class NamselOcr(QMainWindow):
         self.aslider_layout.addWidget(self.aslider)
         self.aslider_place.setLayout(self.aslider_layout)
 
-
-
-
-
         self.amanual_slider_group = QGroupBox()
         self.amanual_slider_group.setFixedHeight(120)
         self.amanual_slider_group.setLayout(self.aslider_layout)
 
+                                # Switch Buttons
+        self.amanual_button2 = QPushButton("Auto")
+        self.amanual_button2.setFixedWidth(100)
 
-
-
-
-
+                            # All together
+        self.amanual_layer2 = QVBoxLayout()
+        self.amanual_place2 = QWidget()
 
         self.amanual_layer2.addWidget(self.amanual_slider_group)
         self.amanual_layer2.addWidget(self.amanual_button2, 0, Qt.AlignCenter)
         self.amanual_layer2.setContentsMargins(0, 0, 0, 0)
         self.amanual_place2.setLayout(self.amanual_layer2)
 
-
-
-
-
-
+                        # StackedLayout together
+        self.amanual_place = QWidget()
         self.aswitch_layer = QStackedLayout(self.amanual_place)
         self.aswitch_layer.addWidget(self.amanual_place1)
         self.aswitch_layer.addWidget(self.amanual_place2)
 
         self.aswitch_layer.setCurrentWidget(self.amanual_place2)
-
-
-
-
 
                         # Label and the dial value
         self.adialabel_val = QLabel(lang.gettext("Break width: "))
@@ -1482,6 +1462,12 @@ class NamselOcr(QMainWindow):
         self.atext_alayer1.show()
         self.atext_alayer2.show()
 
+        word_file = docx.Document()
+        word_file.add_paragraph(data)
+        word_file.save(os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', 'namsel-ocr.docx'))
+        del word_file
+
+
     def copyOutput(self):
         copy("ocr_output.txt", str(self.arg["threshold"]) + "_ocr_output.txt")
         self.del_out_dir()
@@ -1527,7 +1513,6 @@ class NamselOcr(QMainWindow):
     def del_out_dir(self):
         if os.path.isdir(os.path.join(work_directory, "out")):
             rmtree(os.path.join(work_directory, "out"))
-
 
 def killEnvironment():
     docker.stop()
