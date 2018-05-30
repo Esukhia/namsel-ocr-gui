@@ -256,8 +256,102 @@ class NamselOcr(QMainWindow):
         self.achoice_layout.addWidget(self.achoice_p30)
         self.achoice_layout.addWidget(self.achoice_p40)
 
+
+
+
         self.achoice_group = QGroupBox()
+        self.achoice_group.setFixedHeight(120)
         self.achoice_group.setLayout(self.achoice_layout)
+
+
+
+        self.amanual_button1 = QPushButton("Manual")
+        self.amanual_button1.setFixedWidth(100)
+        self.amanual_button2 = QPushButton("Auto")
+        self.amanual_button2.setFixedWidth(100)
+        self.amanual_layer1 = QVBoxLayout()
+        self.amanual_layer2 = QVBoxLayout()
+
+
+
+
+
+        self.amanual_place = QWidget()
+        self.amanual_place1 = QWidget()
+        self.amanual_place2 = QWidget()
+
+        self.amanual_layer1.addWidget(self.achoice_group)
+        self.amanual_layer1.addWidget(self.amanual_button1, 0, Qt.AlignCenter)
+        self.amanual_layer1.setContentsMargins(0,0,0,0)
+        self.amanual_place1.setLayout(self.amanual_layer1)
+
+
+
+
+
+        self.asliderlabel_val = QLabel(lang.gettext("Thickness: "))
+        self.aslcd = QLCDNumber()
+        self.aslcd.setStatusTip(lang.gettext("The thickness value during the preprocess"))
+        self.aslcd.setSegmentStyle(QLCDNumber.Flat)
+        self.aslcd.setFixedWidth(40)
+
+        self.aslider = QSlider(Qt.Horizontal)
+        self.aslider.setRange(-40, 40)
+        self.aslider.setSingleStep(1)
+        self.aslider.setTickPosition(QSlider.TicksBelow)
+        self.aslider.setTickInterval(5)
+        self.aslider.setStatusTip(lang.gettext("Set the thickness of the scan image"))
+
+        
+
+
+
+        self.aslider_label_place = QWidget()
+        self.aslider_label_layout = QHBoxLayout()
+        self.aslider_label_layout.addWidget(self.asliderlabel_val)
+        self.aslider_label_layout.addWidget(self.aslcd)
+        self.aslider_label_layout.setAlignment(Qt.AlignCenter)
+        self.aslider_label_place.setLayout(self.aslider_label_layout)
+
+        self.aslider_place = QWidget()
+        self.aslider_layout = QVBoxLayout()
+        self.aslider_layout.addWidget(self.aslider_label_place)
+        self.aslider_layout.addWidget(self.aslider)
+        self.aslider_place.setLayout(self.aslider_layout)
+
+
+
+
+
+        self.amanual_slider_group = QGroupBox()
+        self.amanual_slider_group.setFixedHeight(120)
+        self.amanual_slider_group.setLayout(self.aslider_layout)
+
+
+
+
+
+
+
+        self.amanual_layer2.addWidget(self.amanual_slider_group)
+        self.amanual_layer2.addWidget(self.amanual_button2, 0, Qt.AlignCenter)
+        self.amanual_layer2.setContentsMargins(0, 0, 0, 0)
+        self.amanual_place2.setLayout(self.amanual_layer2)
+
+
+
+
+
+
+        self.aswitch_layer = QStackedLayout(self.amanual_place)
+        self.aswitch_layer.addWidget(self.amanual_place1)
+        self.aswitch_layer.addWidget(self.amanual_place2)
+
+        self.aswitch_layer.setCurrentWidget(self.amanual_place2)
+
+
+
+
 
                         # Label and the dial value
         self.adialabel_val = QLabel(lang.gettext("Break width: "))
@@ -314,12 +408,12 @@ class NamselOcr(QMainWindow):
         self.aoption_layout = QHBoxLayout()
         self.aoption_layout.addWidget(self.apecha_book_group)
         self.aoption_layout.addWidget(self.alowink_group)
-        self.aoption_layout.addWidget(self.achoice_group)
+        self.aoption_layout.addWidget(self.amanual_place)
         self.aoption_layout.addWidget(self.adial_group)
         self.aoption_layout.addWidget(self.arun_group)
 
         self.aoption_widget = QWidget()
-        self.aoption_widget.setFixedHeight(130)
+        self.aoption_widget.setFixedHeight(200)
         self.aoption_widget.setLayout(self.aoption_layout)
 
                     # Image-text
@@ -534,7 +628,20 @@ class NamselOcr(QMainWindow):
         self.atooltext_down_layer2_layout.addWidget(self.atext_down_layer2)
         self.atooltext_down_layer2.setLayout(self.atooltext_down_layer2_layout)
 
-                            # Result layer
+
+        self.atext_alayer1 = QTextEdit()
+        self.atext_alayer1.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_alayer1.setFont(self.font)
+        self.atext_alayer1.setFontPointSize(18)
+        self.atext_alayer1.hide()
+
+        self.atext_alayer2 = QTextEdit()
+        self.atext_alayer2.setStatusTip(lang.gettext("The ocr result"))
+        self.atext_alayer2.setFont(self.font)
+        self.atext_alayer2.setFontPointSize(18)
+        self.atext_alayer2.hide()
+
+        # Result layer
         self.atooltext_layer2_layout = QVBoxLayout()
         self.atooltext_layer2_layout.addWidget(self.atooltext_up_layer2)
         self.atooltext_layer2_layout.addWidget(self.atooltext_down_layer2)
@@ -544,6 +651,8 @@ class NamselOcr(QMainWindow):
                     # Image-text layout and widget
         self.aimagetext_hlayout = QHBoxLayout()
         self.aimagetext_vlayout = QVBoxLayout()
+        self.aimagetext_ahlayout = QHBoxLayout()
+        self.aimagetext_avlayout = QVBoxLayout()
 
         self.aimagetext_vlayout.addWidget(self.ascan_image_layer1)
         self.aimagetext_vlayout.addWidget(self.azone_layer1)
@@ -551,17 +660,30 @@ class NamselOcr(QMainWindow):
         self.aimagetext_hlayout.addWidget(self.ascan_image_layer2)
         self.aimagetext_hlayout.addWidget(self.azone_layer2)
 
+        self.aimagetext_avlayout.addWidget(self.ascan_image_layer1)
+        self.aimagetext_avlayout.addWidget(self.atext_alayer1)
+
+        self.aimagetext_ahlayout.addWidget(self.ascan_image_layer2)
+        self.aimagetext_ahlayout.addWidget(self.atext_alayer2)
+
         self.aimagetext_widget = QWidget()
         self.aimagetext_vwidget = QWidget()
         self.aimagetext_hwidget = QWidget()
+        self.aimagetext_ahwidget = QWidget()
+        self.aimagetext_avwidget = QWidget()
 
         self.aimagetext_vwidget.setLayout(self.aimagetext_vlayout)
         self.aimagetext_hwidget.setLayout(self.aimagetext_hlayout)
 
+        self.aimagetext_avwidget.setLayout(self.aimagetext_avlayout)
+        self.aimagetext_ahwidget.setLayout(self.aimagetext_ahlayout)
+
         self.aimagetext_staklayout = QStackedLayout(self.aimagetext_widget)
         self.aimagetext_staklayout.addWidget(self.aimagetext_vwidget)
         self.aimagetext_staklayout.addWidget(self.aimagetext_hwidget)
-        self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
+        self.aimagetext_staklayout.addWidget(self.aimagetext_ahwidget)
+        self.aimagetext_staklayout.addWidget(self.aimagetext_avwidget)
+        self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
 
         self.aimagetext_widget.setLayout(self.aimagetext_staklayout)
 
@@ -858,6 +980,9 @@ class NamselOcr(QMainWindow):
         self.lang_subactiongroup.triggered.connect(self.lang)
             # Auto mode
         self.auto_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.autopage_widget))
+        self.aslider.valueChanged.connect(self.aslcd.display)
+        self.amanual_button1.released.connect(self.autoManual)
+        self.amanual_button2.released.connect(self.autoAuto)
         self.adial.valueChanged.connect(lambda x: self.alcd.display(x / 2) if x else self.alcd.display("Off"))
         self.abook_button.toggled.connect(self.pechabook)
         self.adouble_page.toggled.connect(self.double)
@@ -917,6 +1042,12 @@ class NamselOcr(QMainWindow):
             # Docker
         docker.docker_process.finished.connect(self.processFinished)
 
+    def autoManual(self):
+        self.aswitch_layer.setCurrentWidget(self.amanual_place2)
+
+    def autoAuto(self):
+        self.aswitch_layer.setCurrentWidget(self.amanual_place1)
+
     def comparison(self, pos, button, e):
         if e:
             self.scan_image_name_temp = button + "_ocr_output.txt"
@@ -928,7 +1059,11 @@ class NamselOcr(QMainWindow):
         if e:
             if not self.pdouble_page.isChecked() and not self.adouble_page.isChecked():
                 self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
+
+                if self.aswitch_layer.currentWidget() == self.amanual_place1:
+                    self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
+                else:
+                    self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
 
             if self.petat == "Result" and self.pdouble_page.isChecked():
                 self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
@@ -944,7 +1079,12 @@ class NamselOcr(QMainWindow):
         else:
             self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
-            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
+
+            if self.aswitch_layer.currentWidget() == self.amanual_place1:
+                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
+            else:
+                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
+
             self.pd_widget.hide()
             self.od_widget.hide()
             self.adc_widget.hide()
@@ -956,13 +1096,23 @@ class NamselOcr(QMainWindow):
         if e:
             self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
-            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
+
+            if self.aswitch_layer.currentWidget() == self.amanual_place1:
+                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_vwidget)
+            else:
+                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
+
             self.pdouble_page.setChecked(True)
             self.adouble_page.setChecked(True)
         else:
             self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
             self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_hwidget)
-            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
+
+            if self.aswitch_layer.currentWidget() == self.amanual_place1:
+                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_hwidget)
+            else:
+                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
+
             self.pdouble_page.setChecked(False)
             self.adouble_page.setChecked(False)
 
@@ -988,15 +1138,20 @@ class NamselOcr(QMainWindow):
                 self.otext_layer2.hide()
                 self.otext_layer1.clear()
                 self.otext_layer2.clear()
-                self.del_files()
-
-            if self.aetat == "Ocr":
-                self.atext_layer1.hide()
-                self.atext_layer2.hide()
-                self.atext_layer1.clear()
-                self.atext_layer2.clear()
+                self.atext_left_layer1.hide()
+                self.atext_right_layer1.hide()
+                self.atext_up_layer2.hide()
+                self.atext_down_layer2.hide()
+                self.atext_left_layer1.clear()
+                self.atext_right_layer1.clear()
+                self.atext_up_layer2.clear()
+                self.atext_down_layer2.clear()
+                self.atext_alayer1.hide()
+                self.atext_alayer2.hide()
+                self.atext_alayer1.clear()
+                self.atext_alayer2.clear()
                 self.del_out_dir()
-                os.remove(os.path.join(work_directory, "ocr_output.txt"))
+                self.del_files()
 
             self.psimage = QPixmap(self.scan_image_name)
             self.pscan_image_layer1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
@@ -1088,93 +1243,137 @@ class NamselOcr(QMainWindow):
         if self.aetat == "Ocr" or self.aetat == "" and self.petat != "Scan":
             self.openScanImage()
 
+
         if self.dialog_etat and self.aetat != "Result":
-            if len(self.athreshold) == 1:
-                if self.achoice_m40.isChecked():
-                    self.athreshold.append(-40)
-                    self.atool_text_left_files_m40_layer1.show()
-                    self.atool_text_right_files_m40_layer1.show()
-                    self.atool_text_up_files_m40_layer2.show()
-                    self.atool_text_down_files_m40_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_m40_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_m40_layer2
-                    
-                if self.achoice_m30.isChecked():
-                    self.athreshold.append(-30)
-                    self.atool_text_left_files_m30_layer1.show()
-                    self.atool_text_right_files_m30_layer1.show()
-                    self.atool_text_up_files_m30_layer2.show()
-                    self.atool_text_down_files_m30_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_m30_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_m30_layer2
-                    
-                if self.achoice_m20.isChecked():
-                    self.athreshold.append(-20)
-                    self.atool_text_left_files_m20_layer1.show()
-                    self.atool_text_right_files_m20_layer1.show()
-                    self.atool_text_up_files_m20_layer2.show()
-                    self.atool_text_down_files_m20_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_m20_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_m20_layer2
-                    
-                if self.achoice_m10.isChecked():
-                    self.athreshold.append(-10)
-                    self.atool_text_left_files_m10_layer1.show()
-                    self.atool_text_right_files_m10_layer1.show()
-                    self.atool_text_up_files_m10_layer2.show()
-                    self.atool_text_down_files_m10_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_m10_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_m10_layer2
-                    
-                if self.achoice_p10.isChecked():
-                    self.athreshold.append(10)
-                    self.atool_text_left_files_p10_layer1.show()
-                    self.atool_text_right_files_p10_layer1.show()
-                    self.atool_text_up_files_p10_layer2.show()
-                    self.atool_text_down_files_p10_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_p10_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_p10_layer2
-                    
-                if self.achoice_p20.isChecked():
-                    self.athreshold.append(20)
-                    self.atool_text_left_files_p20_layer1.show()
-                    self.atool_text_right_files_p20_layer1.show()
-                    self.atool_text_up_files_p20_layer2.show()
-                    self.atool_text_down_files_p20_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_p20_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_p20_layer2
-                    
-                if self.achoice_p30.isChecked():
-                    self.athreshold.append(30)
-                    self.atool_text_left_files_p30_layer1.show()
-                    self.atool_text_right_files_p30_layer1.show()
-                    self.atool_text_up_files_p30_layer2.show()
-                    self.atool_text_down_files_p30_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_p30_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_p30_layer2
-                    
-                if self.achoice_p40.isChecked():
-                    self.athreshold.append(40)
-                    self.atool_text_left_files_p40_layer1.show()
-                    self.atool_text_right_files_p40_layer1.show()
-                    self.atool_text_up_files_p40_layer2.show()
-                    self.atool_text_down_files_p40_layer2.show()
-                    self.atext2_right_layer1 = self.atool_text_right_files_p40_layer1
-                    self.atext2_down_layer2 = self.atool_text_down_files_p40_layer2
-                    
-            if self.petat == "Scan":
-                self.scan_image_name_temp = QFileInfo(self.scan_image_name).fileName()
-                self.scan_image_filename = str(self.athreshold[self.aloop]) + "_" + self.scan_image_name_temp
-                copy(self.scan_image_name, os.path.join(work_directory, self.scan_image_filename))
+            if self.aswitch_layer.currentWidget() == self.amanual_place1:
+                if len(self.athreshold) == 1:
+                    if self.achoice_m40.isChecked():
+                        self.athreshold.append(-40)
+                        self.atool_text_left_files_m40_layer1.show()
+                        self.atool_text_right_files_m40_layer1.show()
+                        self.atool_text_up_files_m40_layer2.show()
+                        self.atool_text_down_files_m40_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_m40_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_m40_layer2
 
-                if self.adouble_page.isChecked(): self.arg["layout"] = "double"
-                self.arg["threshold"] = self.athreshold[self.aloop]
+                    if self.achoice_m30.isChecked():
+                        self.athreshold.append(-30)
+                        self.atool_text_left_files_m30_layer1.show()
+                        self.atool_text_right_files_m30_layer1.show()
+                        self.atool_text_up_files_m30_layer2.show()
+                        self.atool_text_down_files_m30_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_m30_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_m30_layer2
 
-                self.aetat = "Scan"
+                    if self.achoice_m20.isChecked():
+                        self.athreshold.append(-20)
+                        self.atool_text_left_files_m20_layer1.show()
+                        self.atool_text_right_files_m20_layer1.show()
+                        self.atool_text_up_files_m20_layer2.show()
+                        self.atool_text_down_files_m20_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_m20_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_m20_layer2
 
-                docker.etat = "AutoPreprocess"
-                docker.preprocess(self.arg)
-                self.wait(self.scan_image_name_temp + "\n\n" + "Thickness: " + str(self.arg["threshold"]))
+                    if self.achoice_m10.isChecked():
+                        self.athreshold.append(-10)
+                        self.atool_text_left_files_m10_layer1.show()
+                        self.atool_text_right_files_m10_layer1.show()
+                        self.atool_text_up_files_m10_layer2.show()
+                        self.atool_text_down_files_m10_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_m10_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_m10_layer2
+
+                    if self.achoice_p10.isChecked():
+                        self.athreshold.append(10)
+                        self.atool_text_left_files_p10_layer1.show()
+                        self.atool_text_right_files_p10_layer1.show()
+                        self.atool_text_up_files_p10_layer2.show()
+                        self.atool_text_down_files_p10_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_p10_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_p10_layer2
+
+                    if self.achoice_p20.isChecked():
+                        self.athreshold.append(20)
+                        self.atool_text_left_files_p20_layer1.show()
+                        self.atool_text_right_files_p20_layer1.show()
+                        self.atool_text_up_files_p20_layer2.show()
+                        self.atool_text_down_files_p20_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_p20_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_p20_layer2
+
+                    if self.achoice_p30.isChecked():
+                        self.athreshold.append(30)
+                        self.atool_text_left_files_p30_layer1.show()
+                        self.atool_text_right_files_p30_layer1.show()
+                        self.atool_text_up_files_p30_layer2.show()
+                        self.atool_text_down_files_p30_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_p30_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_p30_layer2
+
+                    if self.achoice_p40.isChecked():
+                        self.athreshold.append(40)
+                        self.atool_text_left_files_p40_layer1.show()
+                        self.atool_text_right_files_p40_layer1.show()
+                        self.atool_text_up_files_p40_layer2.show()
+                        self.atool_text_down_files_p40_layer2.show()
+                        self.atext2_right_layer1 = self.atool_text_right_files_p40_layer1
+                        self.atext2_down_layer2 = self.atool_text_down_files_p40_layer2
+
+                if self.petat == "Scan":
+                    self.scan_image_name_temp = QFileInfo(self.scan_image_name).fileName()
+                    self.scan_image_filename = str(self.athreshold[self.aloop]) + "_" + self.scan_image_name_temp
+                    copy(self.scan_image_name, os.path.join(work_directory, self.scan_image_filename))
+
+                    if self.adouble_page.isChecked(): self.arg["layout"] = "double"
+                    self.arg["threshold"] = self.athreshold[self.aloop]
+
+                    self.aetat = "Scan"
+
+                    docker.etat = "AutoPreprocess"
+                    docker.preprocess(self.arg)
+                    self.wait(self.scan_image_name_temp + "\n\n" + "Thickness: " + str(self.arg["threshold"]))
+            else:
+                if self.petat == "Scan":
+                    if self.pvolume:
+                        answer = QMessageBox.question(self,
+                                                      lang.gettext("Message"),
+                                                      lang.gettext("Preprocess all the volume images?"),
+                                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                        if answer == QMessageBox.Yes:
+                            pass
+                        elif answer == QMessageBox.No:
+                            self.pvolume = False
+                        else:
+                            return
+
+                    if self.pvolume == False:
+                        copy(self.scan_image_name, work_directory)
+                    else:
+                        for f in os.listdir(self.scan_folder_name):
+                            if f.endswith(".tif"):
+                                while True:
+                                    ack = copy(os.path.join(self.scan_folder_name, f), work_directory)
+                                    if ack.find(f): break
+
+                    if self.aslider.value():
+                        self.arg["threshold"] = self.aslider.value()
+                    else:
+                        self.arg["threshold"] = 0
+                    if self.adouble_page.isChecked():
+                        self.arg["layout"] = "double"
+
+                    self.aetat = "Scan"
+
+                    docker.etat = "AutoPreprocess"
+                    docker.preprocess(self.arg)
+                    self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
+
+                    if self.pvolume:
+                        txt = self.scan_folder_name + "\n\n" + "Thickness: " + str(self.arg["threshold"])
+                        self.pvolume = False
+                    else:
+                        txt = self.scan_image_filename + "\n\n" + "Thickness: " + str(self.arg["threshold"])
+                    self.wait(txt)
 
         elif self.aetat == "Result":
             if self.abook_button.isChecked():
@@ -1222,12 +1421,20 @@ class NamselOcr(QMainWindow):
                     self.otext_layer2.clear()
                     self.oetat = ""
 
+                if self.aetat == "Ocr":
+                    self.atext_alayer1.hide()
+                    self.atext_alayer2.hide()
+                    self.atext_alayer1.clear()
+                    self.atext_alayer2.clear()
+                    self.aetat = ""
+
                 self.ascan_image_layer1.clear()
                 self.ascan_image_layer2.clear()
 
         elif docker.etat == "Ocr":
             self.copyFile2Qtext()
             self.oetat = "Ocr"
+            self.aetat = "Ocr"
 
         elif docker.etat == "AutoPreprocess":
             if os.path.isdir(os.path.join(work_directory, "out")) and os.path.isfile(os.path.join(work_directory, "out", self.scan_image_filename)):
@@ -1239,18 +1446,23 @@ class NamselOcr(QMainWindow):
             return
 
         elif docker.etat == "AutoOcr":
-            self.copyOutput()
+            if self.aswitch_layer.currentWidget() == self.amanual_place1:
+                self.copyOutput()
 
-            if self.aloop == len(self.athreshold)-1:
-                self.aloop = 0
-                self.aetat = "Ocr"
-                self.copyFile2QtextAuto()
+                if self.aloop == len(self.athreshold)-1:
+                    self.aloop = 0
+                    self.aetat = "Ocr"
+                    self.copyFile2QtextAuto()
+                else:
+                    self.aloop += 1
+                    self.aetat = "Scan"
+                    docker.endProcess()
+                    self.autoRun()
+                    return
             else:
-                self.aloop += 1
-                self.aetat = "Scan"
-                docker.endProcess()
-                self.autoRun()
-                return
+                self.copyFile2Qtext()
+                self.aetat = "Ocr"
+                self.oetat = "Ocr"
 
         docker.endProcess()
         self.progress.cancel()
@@ -1265,6 +1477,10 @@ class NamselOcr(QMainWindow):
         self.otext_layer2.setText(data)
         self.otext_layer1.show()
         self.otext_layer2.show()
+        self.atext_alayer1.setText(data)
+        self.atext_alayer2.setText(data)
+        self.atext_alayer1.show()
+        self.atext_alayer2.show()
 
     def copyOutput(self):
         copy("ocr_output.txt", str(self.arg["threshold"]) + "_ocr_output.txt")
@@ -1311,6 +1527,7 @@ class NamselOcr(QMainWindow):
     def del_out_dir(self):
         if os.path.isdir(os.path.join(work_directory, "out")):
             rmtree(os.path.join(work_directory, "out"))
+
 
 def killEnvironment():
     docker.stop()
