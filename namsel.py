@@ -1,15 +1,15 @@
+from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 
-from shutil import copy, rmtree
+import sys
+import os
 from tempfile import gettempdir
-import os, sys
-
-import re
+from shutil import copy, rmtree
 
 import gettext
 
+from re import sub
 import docx
 
 # Sharing folders with PyInstaller
@@ -202,546 +202,544 @@ class NamselOcr(QMainWindow):
                 # Auto mode
                     # Option
                         # Pecha - Book radiobuttons
-        self.apecha_button = QRadioButton(lang.gettext("Pecha"))
-        self.apecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
-        self.abook_button = QRadioButton(lang.gettext("Book"))
-        self.abook_button.setStatusTip(lang.gettext("The scan image is a book"))
-        self.apecha_button.setCheckable(True)
-        self.abook_button.setCheckable(True)
-        self.apecha_button.setChecked(True)
+        self.a_option_pecha_button = QRadioButton(lang.gettext("Pecha"))
+        self.a_option_pecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
+        self.a_option_book_button = QRadioButton(lang.gettext("Book"))
+        self.a_option_book_button.setStatusTip(lang.gettext("The scan image is a book"))
+        self.a_option_pecha_button.setCheckable(True)
+        self.a_option_book_button.setCheckable(True)
+        self.a_option_pecha_button.setChecked(True)
 
-        self.apecha_book_layout = QVBoxLayout()
-        self.apecha_book_layout.addWidget(self.apecha_button)
-        self.apecha_book_layout.addWidget(self.abook_button)
+        self.a_option_pecha_book_layout = QVBoxLayout()
+        self.a_option_pecha_book_layout.addWidget(self.a_option_pecha_button)
+        self.a_option_pecha_book_layout.addWidget(self.a_option_book_button)
 
-        self.apecha_book_group = QGroupBox()
-        self.apecha_book_group.setLayout(self.apecha_book_layout)
+        self.a_option_pecha_book_group = QGroupBox()
+        self.a_option_pecha_book_group.setLayout(self.a_option_pecha_book_layout)
 
                         # Low ink
-        self.alowink = QCheckBox(lang.gettext("Low ink"))
-        self.alowink.setStatusTip(lang.gettext("Check if the scan image is a bit of low quality"))
+        self.a_option_lowink_check = QCheckBox(lang.gettext("Low ink"))
+        self.a_option_lowink_check.setStatusTip(lang.gettext("Check if the scan image is a bit of low quality"))
 
-        self.alowink_layout = QVBoxLayout()
-        self.alowink_layout.addWidget(self.alowink)
+        self.a_option_lowink_layout = QVBoxLayout()
+        self.a_option_lowink_layout.addWidget(self.a_option_lowink_check)
 
-        self.alowink_group = QGroupBox()
-        self.alowink_group.setLayout(self.alowink_layout)
+        self.a_option_lowink_group = QGroupBox()
+        self.a_option_lowink_group.setLayout(self.a_option_lowink_layout)
 
                         # Checks and manual
                             # Automatic checks
                                 # Choice
-        self.achoice_m40 = QCheckBox(lang.gettext("-40"))
-        self.achoice_m30 = QCheckBox(lang.gettext("-30"))
-        self.achoice_m20 = QCheckBox(lang.gettext("-20"))
-        self.achoice_m10 = QCheckBox(lang.gettext("-10"))
-        self.achoice_0 = QCheckBox(lang.gettext("0"))
-        self.achoice_p10 = QCheckBox(lang.gettext("+10"))
-        self.achoice_p20 = QCheckBox(lang.gettext("+20"))
-        self.achoice_p30 = QCheckBox(lang.gettext("+30"))
-        self.achoice_p40 = QCheckBox(lang.gettext("+40"))
+        self.a_option_auto_choice_m40_check = QCheckBox(lang.gettext("-40"))
+        self.a_option_auto_choice_m30_check = QCheckBox(lang.gettext("-30"))
+        self.a_option_auto_choice_m20_check = QCheckBox(lang.gettext("-20"))
+        self.a_option_auto_choice_m10_check = QCheckBox(lang.gettext("-10"))
+        self.a_option_auto_choice_0_check = QCheckBox(lang.gettext("0"))
+        self.a_option_auto_choice_p10_check = QCheckBox(lang.gettext("+10"))
+        self.a_option_auto_choice_p20_check = QCheckBox(lang.gettext("+20"))
+        self.a_option_auto_choice_p30_check = QCheckBox(lang.gettext("+30"))
+        self.a_option_auto_choice_p40_check = QCheckBox(lang.gettext("+40"))
 
-        self.achoice_m40.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -40"))
-        self.achoice_m30.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -30"))
-        self.achoice_m20.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -20"))
-        self.achoice_m10.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -10"))
-        self.achoice_0.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 0"))
-        self.achoice_p10.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 10"))
-        self.achoice_p20.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 20"))
-        self.achoice_p30.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 30"))
-        self.achoice_p40.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 40"))
+        self.a_option_auto_choice_m40_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -40"))
+        self.a_option_auto_choice_m30_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -30"))
+        self.a_option_auto_choice_m20_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -20"))
+        self.a_option_auto_choice_m10_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to -10"))
+        self.a_option_auto_choice_0_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 0"))
+        self.a_option_auto_choice_p10_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 10"))
+        self.a_option_auto_choice_p20_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 20"))
+        self.a_option_auto_choice_p30_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 30"))
+        self.a_option_auto_choice_p40_check.setStatusTip(lang.gettext("Preprocessing setting the 'thickness' value to 40"))
 
-        self.achoice_0.setDisabled(True)
-        self.achoice_0.setChecked(True)
+        self.a_option_auto_choice_0_check.setDisabled(True)
+        self.a_option_auto_choice_0_check.setChecked(True)
 
-        self.achoice_layout = QHBoxLayout()
-        self.achoice_layout.addWidget(self.achoice_m40)
-        self.achoice_layout.addWidget(self.achoice_m30)
-        self.achoice_layout.addWidget(self.achoice_m20)
-        self.achoice_layout.addWidget(self.achoice_m10)
-        self.achoice_layout.addWidget(self.achoice_0)
-        self.achoice_layout.addWidget(self.achoice_p10)
-        self.achoice_layout.addWidget(self.achoice_p20)
-        self.achoice_layout.addWidget(self.achoice_p30)
-        self.achoice_layout.addWidget(self.achoice_p40)
+        self.a_option_auto_choice_layout = QHBoxLayout()
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_m40_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_m30_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_m20_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_m10_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_0_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_p10_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_p20_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_p30_check)
+        self.a_option_auto_choice_layout.addWidget(self.a_option_auto_choice_p40_check)
 
-        self.achoice_group = QGroupBox()
-        self.achoice_group.setFixedHeight(100)
-        self.achoice_group.setLayout(self.achoice_layout)
+        self.a_option_auto_choice_group = QGroupBox()
+        self.a_option_auto_choice_group.setFixedHeight(100)
+        self.a_option_auto_choice_group.setLayout(self.a_option_auto_choice_layout)
 
                                 # Switch Buttons
-        self.amanual_button1 = QPushButton(lang.gettext("Manual"))
-        self.amanual_button1.setStatusTip(lang.gettext("Switch to Manual settings"))
-        self.amanual_button1.setFixedWidth(100)
+        self.a_option_auto_tomanual_button = QPushButton(lang.gettext("Manual"))
+        self.a_option_auto_tomanual_button.setStatusTip(lang.gettext("Switch to Manual settings"))
+        self.a_option_auto_tomanual_button.setFixedWidth(100)
 
                             # All together
-        self.amanual_layer1 = QVBoxLayout()
+        self.a_option_auto_choice_tomanual_layer = QVBoxLayout()
 
-        self.amanual_place1 = QWidget()
+        self.a_option_auto_choice_tomanual_widget = QWidget()
 
-        self.amanual_layer1.addWidget(self.achoice_group)
-        self.amanual_layer1.addWidget(self.amanual_button1, 0, Qt.AlignCenter)
-        self.amanual_layer1.setContentsMargins(0,0,0,0)
-        self.amanual_place1.setLayout(self.amanual_layer1)
+        self.a_option_auto_choice_tomanual_layer.addWidget(self.a_option_auto_choice_group)
+        self.a_option_auto_choice_tomanual_layer.addWidget(self.a_option_auto_tomanual_button, 0, Qt.AlignCenter)
+        self.a_option_auto_choice_tomanual_layer.setContentsMargins(0, 0, 0, 0)
+        self.a_option_auto_choice_tomanual_widget.setLayout(self.a_option_auto_choice_tomanual_layer)
 
                             # Manual settings
                                 # Label & Slider
-        self.asliderlabel_val = QLabel(lang.gettext("Thickness: "))
-        self.aslcd = QLCDNumber()
-        self.aslcd.setStatusTip(lang.gettext("The thickness value during the preprocess"))
-        self.aslcd.setSegmentStyle(QLCDNumber.Flat)
-        self.aslcd.setFixedWidth(40)
+        self.a_option_manual_sliderlabel = QLabel(lang.gettext("Thickness: "))
+        self.a_option_manual_sliderlcd = QLCDNumber()
+        self.a_option_manual_sliderlcd.setStatusTip(lang.gettext("The thickness value during the preprocess"))
+        self.a_option_manual_sliderlcd.setSegmentStyle(QLCDNumber.Flat)
+        self.a_option_manual_sliderlcd.setFixedWidth(40)
 
-        self.aslider = QSlider(Qt.Horizontal)
-        self.aslider.setRange(-40, 40)
-        self.aslider.setSingleStep(1)
-        self.aslider.setTickPosition(QSlider.TicksBelow)
-        self.aslider.setTickInterval(5)
-        self.aslider.setStatusTip(lang.gettext("Set the thickness of the scan image"))
+        self.a_option_manual_slider = QSlider(Qt.Horizontal)
+        self.a_option_manual_slider.setRange(-40, 40)
+        self.a_option_manual_slider.setSingleStep(1)
+        self.a_option_manual_slider.setTickPosition(QSlider.TicksBelow)
+        self.a_option_manual_slider.setTickInterval(5)
+        self.a_option_manual_slider.setStatusTip(lang.gettext("Set the thickness of the scan image"))
 
-        self.aslider_label_place = QWidget()
-        self.aslider_label_layout = QHBoxLayout()
-        self.aslider_label_layout.addWidget(self.asliderlabel_val)
-        self.aslider_label_layout.addWidget(self.aslcd)
-        self.aslider_label_layout.setAlignment(Qt.AlignCenter)
-        self.aslider_label_place.setLayout(self.aslider_label_layout)
+        self.a_option_manual_sliderlabel_sliderlcd_widget = QWidget()
+        self.a_option_manual_sliderlabel_sliderlcd_layout = QHBoxLayout()
+        self.a_option_manual_sliderlabel_sliderlcd_layout.addWidget(self.a_option_manual_sliderlabel)
+        self.a_option_manual_sliderlabel_sliderlcd_layout.addWidget(self.a_option_manual_sliderlcd)
+        self.a_option_manual_sliderlabel_sliderlcd_layout.setAlignment(Qt.AlignCenter)
+        self.a_option_manual_sliderlabel_sliderlcd_widget.setLayout(self.a_option_manual_sliderlabel_sliderlcd_layout)
 
-        self.aslider_place = QWidget()
-        self.aslider_layout = QVBoxLayout()
-        self.aslider_layout.addWidget(self.aslider_label_place)
-        self.aslider_layout.addWidget(self.aslider)
-        self.aslider_place.setLayout(self.aslider_layout)
-
-        self.amanual_slider_group = QGroupBox()
-        self.amanual_slider_group.setFixedHeight(100)
-        self.amanual_slider_group.setLayout(self.aslider_layout)
+        self.a_option_manual_slider_group = QGroupBox()
+        self.a_option_manual_slider_group.setFixedHeight(100)
+        self.a_option_manual_slider_layout = QVBoxLayout()
+        self.a_option_manual_slider_layout.addWidget(self.a_option_manual_sliderlabel_sliderlcd_widget)
+        self.a_option_manual_slider_layout.addWidget(self.a_option_manual_slider)
+        self.a_option_manual_slider_group.setLayout(self.a_option_manual_slider_layout)
 
                                 # Switch Buttons
-        self.amanual_button2 = QPushButton(lang.gettext("Auto"))
-        self.amanual_button2.setStatusTip(lang.gettext("Switch to Auto settings"))
-        self.amanual_button2.setFixedWidth(100)
+        self.a_option_auto_toauto_button = QPushButton(lang.gettext("Auto"))
+        self.a_option_auto_toauto_button.setStatusTip(lang.gettext("Switch to Auto settings"))
+        self.a_option_auto_toauto_button.setFixedWidth(100)
 
                             # All together
-        self.amanual_layer2 = QVBoxLayout()
-        self.amanual_place2 = QWidget()
-
-        self.amanual_layer2.addWidget(self.amanual_slider_group)
-        self.amanual_layer2.addWidget(self.amanual_button2, 0, Qt.AlignCenter)
-        self.amanual_layer2.setContentsMargins(0, 0, 0, 0)
-        self.amanual_place2.setLayout(self.amanual_layer2)
+        self.a_option_manual_slider_toauto_layout = QVBoxLayout()
+        self.a_option_manual_slider_toauto_widget = QWidget()
+        
+        self.a_option_manual_slider_toauto_layout.addWidget(self.a_option_manual_slider_group)
+        self.a_option_manual_slider_toauto_layout.addWidget(self.a_option_auto_toauto_button, 0, Qt.AlignCenter)
+        self.a_option_manual_slider_toauto_layout.setContentsMargins(0, 0, 0, 0)
+        self.a_option_manual_slider_toauto_widget.setLayout(self.a_option_manual_slider_toauto_layout)
 
                         # StackedLayout together
-        self.amanual_place = QWidget()
-        self.aswitch_layer = QStackedLayout(self.amanual_place)
-        self.aswitch_layer.addWidget(self.amanual_place1)
-        self.aswitch_layer.addWidget(self.amanual_place2)
+        self.a_option_manual_auto_switch_widget = QWidget()
+        self.a_option_manual_auto_switch_layout = QStackedLayout(self.a_option_manual_auto_switch_widget)
+        self.a_option_manual_auto_switch_layout.addWidget(self.a_option_auto_choice_tomanual_widget)
+        self.a_option_manual_auto_switch_layout.addWidget(self.a_option_manual_slider_toauto_widget)
 
-        self.aswitch_layer.setCurrentWidget(self.amanual_place2)
+        self.a_option_manual_auto_switch_layout.setCurrentWidget(self.a_option_manual_slider_toauto_widget)
 
                         # Label and the dial value
-        self.adialabel_val = QLabel(lang.gettext("Break width: "))
-        self.alcd = QLCDNumber()
-        self.alcd.setStatusTip(lang.gettext("The break-Width value"))
-        self.alcd.setSegmentStyle(QLCDNumber.Flat)
-        self.alcd.setFixedWidth(40)
-        self.alcd.display(lang.gettext("Off"))
+        self.a_option_dial_label = QLabel(lang.gettext("Break width: "))
+        self.a_option_diallcd = QLCDNumber()
+        self.a_option_diallcd.setStatusTip(lang.gettext("The break-Width value"))
+        self.a_option_diallcd.setSegmentStyle(QLCDNumber.Flat)
+        self.a_option_diallcd.setFixedWidth(40)
+        self.a_option_diallcd.display(lang.gettext("Off"))
 
-        self.adial_label_num_layout = QHBoxLayout()
-        self.adial_label_num_layout.addWidget(self.adialabel_val)
-        self.adial_label_num_layout.addWidget(self.alcd)
-        self.adial_label_num_layout.setAlignment(Qt.AlignCenter)
+        self.a_option_dial_label_diallcd__layout = QHBoxLayout()
+        self.a_option_dial_label_diallcd__layout.addWidget(self.a_option_dial_label)
+        self.a_option_dial_label_diallcd__layout.addWidget(self.a_option_diallcd)
+        self.a_option_dial_label_diallcd__layout.setAlignment(Qt.AlignCenter)
 
                         # QDial
-        self.adial = QDial()
-        self.adial.setRange(0, 8)
-        self.adial.setNotchesVisible(True)
-        self.adial.setStatusTip(lang.gettext("To controls how horizontally-connected stacks will be segmented"))
+        self.a_option_dial = QDial()
+        self.a_option_dial.setRange(0, 8)
+        self.a_option_dial.setNotchesVisible(True)
+        self.a_option_dial.setStatusTip(lang.gettext("To controls how horizontally-connected stacks will be segmented"))
 
-        self.adial_layout = QHBoxLayout()
-        self.adial_layout.addLayout(self.adial_label_num_layout)
-        self.adial_layout.addWidget(self.adial)
+        self.a_option_dial_layout = QHBoxLayout()
+        self.a_option_dial_layout.addLayout(self.a_option_dial_label_diallcd__layout)
+        self.a_option_dial_layout.addWidget(self.a_option_dial)
 
-        self.adial_group = QGroupBox()
-        self.adial_group.setLayout(self.adial_layout)
+        self.a_option_dial_group = QGroupBox()
+        self.a_option_dial_group.setLayout(self.a_option_dial_layout)
 
                         # Run the Auto mode
-        self.adouble_page = QCheckBox(lang.gettext("Double page"))
-        self.adouble_page.setStatusTip(lang.gettext("The scan image is a double page"))
+        self.a_option_double_page_check = QCheckBox(lang.gettext("Double page"))
+        self.a_option_double_page_check.setStatusTip(lang.gettext("The scan image is a double page"))
 
-        self.aclearhr = QCheckBox(lang.gettext("Clear HR"))
-        self.aclearhr.setStatusTip(lang.gettext("The scan image is a double page"))
+        self.a_option_clearhr_check = QCheckBox(lang.gettext("Clear HR"))
+        self.a_option_clearhr_check.setStatusTip(lang.gettext("The scan image is a double page"))
 
-        self.arun_button = QPushButton(lang.gettext("Run"))
-        self.arun_button.setStatusTip(lang.gettext("Run the ocr"))
+        self.a_option_run_button = QPushButton(lang.gettext("Run"))
+        self.a_option_run_button.setStatusTip(lang.gettext("Run the ocr"))
 
-        self.adc_layout = QHBoxLayout()
-        self.adc_layout.addWidget(self.adouble_page)
-        self.adc_layout.addWidget(self.aclearhr)
+        self.a_option_double_page_clearhr_layout = QHBoxLayout()
+        self.a_option_double_page_clearhr_layout.addWidget(self.a_option_double_page_check)
+        self.a_option_double_page_clearhr_layout.addWidget(self.a_option_clearhr_check)
 
-        self.adc_widget = QWidget()
-        self.adc_widget.setLayout(self.adc_layout)
-        self.adc_widget.hide()
+        self.a_option_double_page_clearhr_widget = QWidget()
+        self.a_option_double_page_clearhr_widget.setLayout(self.a_option_double_page_clearhr_layout)
+        self.a_option_double_page_clearhr_widget.hide()
 
-        self.arun_layout = QVBoxLayout()
-        self.arun_layout.addWidget(self.adc_widget)
-        self.arun_layout.addWidget(self.arun_button)
+        self.a_option_double_page_clearhr_run_layout = QVBoxLayout()
+        self.a_option_double_page_clearhr_run_layout.addWidget(self.a_option_double_page_clearhr_widget)
+        self.a_option_double_page_clearhr_run_layout.addWidget(self.a_option_run_button)
 
-        self.arun_group = QGroupBox()
-        self.arun_group.setLayout(self.arun_layout)
+        self.a_option_double_page_clearhr_run_group = QGroupBox()
+        self.a_option_double_page_clearhr_run_group.setLayout(self.a_option_double_page_clearhr_run_layout)
 
                     # Option layout & widget
-        self.aoption_layout = QHBoxLayout()
-        self.aoption_layout.addWidget(self.apecha_book_group)
-        self.aoption_layout.addWidget(self.alowink_group)
-        self.aoption_layout.addWidget(self.amanual_place)
-        self.aoption_layout.addWidget(self.adial_group)
-        self.aoption_layout.addWidget(self.arun_group)
+        self.a_option_layout = QHBoxLayout()
+        self.a_option_layout.addWidget(self.a_option_pecha_book_group)
+        self.a_option_layout.addWidget(self.a_option_lowink_group)
+        self.a_option_layout.addWidget(self.a_option_manual_auto_switch_widget)
+        self.a_option_layout.addWidget(self.a_option_dial_group)
+        self.a_option_layout.addWidget(self.a_option_double_page_clearhr_run_group)
 
-        self.aoption_widget = QWidget()
-        self.aoption_widget.setFixedHeight(160)
-        self.aoption_widget.setLayout(self.aoption_layout)
+        self.a_option_widget = QWidget()
+        self.a_option_widget.setFixedHeight(160)
+        self.a_option_widget.setLayout(self.a_option_layout)
 
                     # Image-text
                         # Scan image widget
-        self.ascan_image_layer1 = QLabel()
-        self.ascan_image_layer2 = QLabel()
-        self.ascan_image_layer1.setStatusTip(lang.gettext("The scan image"))
-        self.ascan_image_layer2.setStatusTip(lang.gettext("The scan image"))
+        self.a_scan_image_label1 = QLabel()
+        self.a_scan_image_label2 = QLabel()
+        self.a_scan_image_label1.setStatusTip(lang.gettext("The scan image"))
+        self.a_scan_image_label2.setStatusTip(lang.gettext("The scan image"))
 
                         # Result text widget & layout
-        self.azone_layer1_place = QWidget()
-        self.azone_layer2_place = QWidget()
+        self.a_result_auto_widget1 = QWidget()
+        self.a_result_auto_widget2 = QWidget()
 
                                 # Left
-        self.atooltext_left_layer1 = QWidget()
+        self.a_result_tool_text_left_widget = QWidget()
                                     # Toolbar for file comparison
-        self.atool_text_left_files_layer1 = QWidget()
+        self.a_result_auto_tool_left_widget = QWidget()
 
-        self.atool_text_left_files_m40_layer1 = QRadioButton("-40")
-        self.atool_text_left_files_m30_layer1 = QRadioButton("-30")
-        self.atool_text_left_files_m20_layer1 = QRadioButton("-20")
-        self.atool_text_left_files_m10_layer1 = QRadioButton("-10")
-        self.atool_text_left_files_0_layer1 = QRadioButton("0")
-        self.atool_text_left_files_p10_layer1 = QRadioButton("10")
-        self.atool_text_left_files_p20_layer1 = QRadioButton("20")
-        self.atool_text_left_files_p30_layer1 = QRadioButton("30")
-        self.atool_text_left_files_p40_layer1 = QRadioButton("40")
+        self.a_result_auto_tool_left_m40_radio = QRadioButton("-40")
+        self.a_result_auto_tool_left_m30_radio = QRadioButton("-30")
+        self.a_result_auto_tool_left_m20_radio = QRadioButton("-20")
+        self.a_result_auto_tool_left_m10_radio = QRadioButton("-10")
+        self.a_result_auto_tool_left_0_radio = QRadioButton("0")
+        self.a_result_auto_tool_left_p10_radio = QRadioButton("10")
+        self.a_result_auto_tool_left_p20_radio = QRadioButton("20")
+        self.a_result_auto_tool_left_p30_radio = QRadioButton("30")
+        self.a_result_auto_tool_left_p40_radio = QRadioButton("40")
 
-        self.atool_text_left_files_m40_layer1.hide()
-        self.atool_text_left_files_m30_layer1.hide()
-        self.atool_text_left_files_m20_layer1.hide()
-        self.atool_text_left_files_m10_layer1.hide()
-        self.atool_text_left_files_p10_layer1.hide()
-        self.atool_text_left_files_p20_layer1.hide()
-        self.atool_text_left_files_p30_layer1.hide()
-        self.atool_text_left_files_p40_layer1.hide()
+        self.a_result_auto_tool_left_m40_radio.hide()
+        self.a_result_auto_tool_left_m30_radio.hide()
+        self.a_result_auto_tool_left_m20_radio.hide()
+        self.a_result_auto_tool_left_m10_radio.hide()
+        self.a_result_auto_tool_left_p10_radio.hide()
+        self.a_result_auto_tool_left_p20_radio.hide()
+        self.a_result_auto_tool_left_p30_radio.hide()
+        self.a_result_auto_tool_left_p40_radio.hide()
 
-        self.atool_text_left_files_layer1_layout = QHBoxLayout()
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m40_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m30_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m20_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_m10_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_0_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p10_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p20_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p30_layer1)
-        self.atool_text_left_files_layer1_layout.addWidget(self.atool_text_left_files_p40_layer1)
+        self.a_result_auto_tool_left_layout = QHBoxLayout()
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_m40_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_m30_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_m20_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_m10_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_0_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_p10_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_p20_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_p30_radio)
+        self.a_result_auto_tool_left_layout.addWidget(self.a_result_auto_tool_left_p40_radio)
 
-        self.atool_text_left_files_layer1.setLayout(self.atool_text_left_files_layer1_layout)
+        self.a_result_auto_tool_left_widget.setLayout(self.a_result_auto_tool_left_layout)
 
                                     # Text
-        self.atext_left_layer1 = QTextEdit()
-        self.atext_left_layer1.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_left_layer1.setFont(self.font)
-        self.atext_left_layer1.setFontPointSize(18)
+        self.a_result_text_left_textedit = QTextEdit()
+        self.a_result_text_left_textedit.setStatusTip(lang.gettext("The ocr result"))
+        self.a_result_text_left_textedit.setFont(self.font)
+        self.a_result_text_left_textedit.setFontPointSize(18)
 
-        self.atooltext_left_layer1_layout = QVBoxLayout()
-        self.atooltext_left_layer1_layout.addWidget(self.atool_text_left_files_layer1)
-        self.atooltext_left_layer1_layout.addWidget(self.atext_left_layer1)
-        self.atooltext_left_layer1.setLayout(self.atooltext_left_layer1_layout)
+        self.a_result_tool_text_left_layout = QVBoxLayout()
+        self.a_result_tool_text_left_layout.addWidget(self.a_result_auto_tool_left_widget)
+        self.a_result_tool_text_left_layout.addWidget(self.a_result_text_left_textedit)
+        self.a_result_tool_text_left_widget.setLayout(self.a_result_tool_text_left_layout)
 
                                 # Right
-        self.atooltext_right_layer1 = QWidget()
+        self.a_result_tool_text_right_widget = QWidget()
                                     # Toolbar for file comparison
-        self.atool_text_right_files_layer1 = QWidget()
+        self.a_result_auto_tool_right_widget = QWidget()
 
-        self.atool_text_right_files_m40_layer1 = QRadioButton("-40")
-        self.atool_text_right_files_m30_layer1 = QRadioButton("-30")
-        self.atool_text_right_files_m20_layer1 = QRadioButton("-20")
-        self.atool_text_right_files_m10_layer1 = QRadioButton("-10")
-        self.atool_text_right_files_0_layer1 = QRadioButton("0")
-        self.atool_text_right_files_p10_layer1 = QRadioButton("10")
-        self.atool_text_right_files_p20_layer1 = QRadioButton("20")
-        self.atool_text_right_files_p30_layer1 = QRadioButton("30")
-        self.atool_text_right_files_p40_layer1 = QRadioButton("40")
+        self.a_result_auto_tool_right_m40_radio = QRadioButton("-40")
+        self.a_result_auto_tool_right_m30_radio = QRadioButton("-30")
+        self.a_result_auto_tool_right_m20_radio = QRadioButton("-20")
+        self.a_result_auto_tool_right_m10_radio = QRadioButton("-10")
+        self.a_result_auto_tool_right_0_radio = QRadioButton("0")
+        self.a_result_auto_tool_right_p10_radio = QRadioButton("10")
+        self.a_result_auto_tool_right_p20_radio = QRadioButton("20")
+        self.a_result_auto_tool_right_p30_radio = QRadioButton("30")
+        self.a_result_auto_tool_right_p40_radio = QRadioButton("40")
 
-        self.atool_text_right_files_m40_layer1.hide()
-        self.atool_text_right_files_m30_layer1.hide()
-        self.atool_text_right_files_m20_layer1.hide()
-        self.atool_text_right_files_m10_layer1.hide()
-        self.atool_text_right_files_p10_layer1.hide()
-        self.atool_text_right_files_p20_layer1.hide()
-        self.atool_text_right_files_p30_layer1.hide()
-        self.atool_text_right_files_p40_layer1.hide()
+        self.a_result_auto_tool_right_m40_radio.hide()
+        self.a_result_auto_tool_right_m30_radio.hide()
+        self.a_result_auto_tool_right_m20_radio.hide()
+        self.a_result_auto_tool_right_m10_radio.hide()
+        self.a_result_auto_tool_right_p10_radio.hide()
+        self.a_result_auto_tool_right_p20_radio.hide()
+        self.a_result_auto_tool_right_p30_radio.hide()
+        self.a_result_auto_tool_right_p40_radio.hide()
 
-        self.atool_text_right_files_layer1_layout = QHBoxLayout()
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m40_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m30_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m20_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_m10_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_0_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p10_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p20_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p30_layer1)
-        self.atool_text_right_files_layer1_layout.addWidget(self.atool_text_right_files_p40_layer1)
+        self.a_result_auto_tool_right_layout = QHBoxLayout()
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_m40_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_m30_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_m20_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_m10_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_0_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_p10_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_p20_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_p30_radio)
+        self.a_result_auto_tool_right_layout.addWidget(self.a_result_auto_tool_right_p40_radio)
 
-        self.atool_text_right_files_layer1.setLayout(self.atool_text_right_files_layer1_layout)
+        self.a_result_auto_tool_right_widget.setLayout(self.a_result_auto_tool_right_layout)
 
                                    # Text
-        self.atext_right_layer1 = QTextEdit()
-        self.atext_right_layer1.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_right_layer1.setFont(self.font)
-        self.atext_right_layer1.setFontPointSize(18)
+        self.a_result_text_right_textedit = QTextEdit()
+        self.a_result_text_right_textedit.setStatusTip(lang.gettext("The ocr result"))
+        self.a_result_text_right_textedit.setFont(self.font)
+        self.a_result_text_right_textedit.setFontPointSize(18)
 
-        self.atooltext_right_layer1_layout = QVBoxLayout()
-        self.atooltext_right_layer1_layout.addWidget(self.atool_text_right_files_layer1)
-        self.atooltext_right_layer1_layout.addWidget(self.atext_right_layer1)
-        self.atooltext_right_layer1.setLayout(self.atooltext_right_layer1_layout)
+        self.a_result_tool_text_right_layout = QVBoxLayout()
+        self.a_result_tool_text_right_layout.addWidget(self.a_result_auto_tool_right_widget)
+        self.a_result_tool_text_right_layout.addWidget(self.a_result_text_right_textedit)
+        self.a_result_tool_text_right_widget.setLayout(self.a_result_tool_text_right_layout)
 
                             # Result layer1
-        self.atooltext_layer1_layout = QHBoxLayout()
-        self.atooltext_layer1_layout.addWidget(self.atooltext_left_layer1)
-        self.atooltext_layer1_layout.addWidget(self.atooltext_right_layer1)
+        self.a_result_auto_layer1_layout = QHBoxLayout()
+        self.a_result_auto_layer1_layout.addWidget(self.a_result_tool_text_left_widget)
+        self.a_result_auto_layer1_layout.addWidget(self.a_result_tool_text_right_widget)
 
-        self.azone_layer1_place.setLayout(self.atooltext_layer1_layout)
+        self.a_result_auto_widget1.setLayout(self.a_result_auto_layer1_layout)
 
                                 # Up
-        self.atooltext_up_layer2 = QWidget()
+        self.a_result_tool_text_up_widget = QWidget()
                                     # Toolbar for file comparison
-        self.atool_text_up_files_layer2 = QWidget()
+        self.a_result_auto_tool_up_widget = QWidget()
 
-        self.atool_text_up_files_m40_layer2 = QRadioButton("-40")
-        self.atool_text_up_files_m30_layer2 = QRadioButton("-30")
-        self.atool_text_up_files_m20_layer2 = QRadioButton("-20")
-        self.atool_text_up_files_m10_layer2 = QRadioButton("-10")
-        self.atool_text_up_files_0_layer2 = QRadioButton("0")
-        self.atool_text_up_files_p10_layer2 = QRadioButton("10")
-        self.atool_text_up_files_p20_layer2 = QRadioButton("20")
-        self.atool_text_up_files_p30_layer2 = QRadioButton("30")
-        self.atool_text_up_files_p40_layer2 = QRadioButton("40")
+        self.a_result_auto_tool_up_m40_radio = QRadioButton("-40")
+        self.a_result_auto_tool_up_m30_radio = QRadioButton("-30")
+        self.a_result_auto_tool_up_m20_radio = QRadioButton("-20")
+        self.a_result_auto_tool_up_m10_radio = QRadioButton("-10")
+        self.a_result_auto_tool_up_0_radio = QRadioButton("0")
+        self.a_result_auto_tool_up_p10_radio = QRadioButton("10")
+        self.a_result_auto_tool_up_p20_radio = QRadioButton("20")
+        self.a_result_auto_tool_up_p30_radio = QRadioButton("30")
+        self.a_result_auto_tool_up_p40_radio = QRadioButton("40")
 
-        self.atool_text_up_files_m40_layer2.hide()
-        self.atool_text_up_files_m30_layer2.hide()
-        self.atool_text_up_files_m20_layer2.hide()
-        self.atool_text_up_files_m10_layer2.hide()
-        self.atool_text_up_files_p10_layer2.hide()
-        self.atool_text_up_files_p20_layer2.hide()
-        self.atool_text_up_files_p30_layer2.hide()
-        self.atool_text_up_files_p40_layer2.hide()
+        self.a_result_auto_tool_up_m40_radio.hide()
+        self.a_result_auto_tool_up_m30_radio.hide()
+        self.a_result_auto_tool_up_m20_radio.hide()
+        self.a_result_auto_tool_up_m10_radio.hide()
+        self.a_result_auto_tool_up_p10_radio.hide()
+        self.a_result_auto_tool_up_p20_radio.hide()
+        self.a_result_auto_tool_up_p30_radio.hide()
+        self.a_result_auto_tool_up_p40_radio.hide()
 
-        self.atool_text_up_files_layer2_layout = QHBoxLayout()
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m40_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m30_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m20_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_m10_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_0_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p10_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p20_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p30_layer2)
-        self.atool_text_up_files_layer2_layout.addWidget(self.atool_text_up_files_p40_layer2)
+        self.a_result_auto_tool_up_layout = QHBoxLayout()
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_m40_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_m30_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_m20_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_m10_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_0_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_p10_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_p20_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_p30_radio)
+        self.a_result_auto_tool_up_layout.addWidget(self.a_result_auto_tool_up_p40_radio)
 
-        self.atool_text_up_files_layer2.setLayout(self.atool_text_up_files_layer2_layout)
+        self.a_result_auto_tool_up_widget.setLayout(self.a_result_auto_tool_up_layout)
 
                                     # Text
-        self.atext_up_layer2 = QTextEdit()
-        self.atext_up_layer2.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_up_layer2.setFont(self.font)
-        self.atext_up_layer2.setFontPointSize(18)
+        self.a_result_text_up_textedit = QTextEdit()
+        self.a_result_text_up_textedit.setStatusTip(lang.gettext("The ocr result"))
+        self.a_result_text_up_textedit.setFont(self.font)
+        self.a_result_text_up_textedit.setFontPointSize(18)
 
-        self.atooltext_up_layer2_layout = QVBoxLayout()
-        self.atooltext_up_layer2_layout.addWidget(self.atool_text_up_files_layer2)
-        self.atooltext_up_layer2_layout.addWidget(self.atext_up_layer2)
-        self.atooltext_up_layer2.setLayout(self.atooltext_up_layer2_layout)
+        self.a_result_tool_text_up_layout = QVBoxLayout()
+        self.a_result_tool_text_up_layout.addWidget(self.a_result_auto_tool_up_widget)
+        self.a_result_tool_text_up_layout.addWidget(self.a_result_text_up_textedit)
+        self.a_result_tool_text_up_widget.setLayout(self.a_result_tool_text_up_layout)
 
                                 # Down
-        self.atooltext_down_layer2 = QWidget()
+        self.a_result_tool_text_down_widget = QWidget()
                                     # Toolbar for file comparison
-        self.atool_text_down_files_layer2 = QWidget()
+        self.a_result_auto_tool_down_widget = QWidget()
 
-        self.atool_text_down_files_m40_layer2 = QRadioButton("-40")
-        self.atool_text_down_files_m30_layer2 = QRadioButton("-30")
-        self.atool_text_down_files_m20_layer2 = QRadioButton("-20")
-        self.atool_text_down_files_m10_layer2 = QRadioButton("-10")
-        self.atool_text_down_files_0_layer2 = QRadioButton("0")
-        self.atool_text_down_files_p10_layer2 = QRadioButton("10")
-        self.atool_text_down_files_p20_layer2 = QRadioButton("20")
-        self.atool_text_down_files_p30_layer2 = QRadioButton("30")
-        self.atool_text_down_files_p40_layer2 = QRadioButton("40")
+        self.a_result_auto_tool_down_m40_radio = QRadioButton("-40")
+        self.a_result_auto_tool_down_m30_radio = QRadioButton("-30")
+        self.a_result_auto_tool_down_m20_radio = QRadioButton("-20")
+        self.a_result_auto_tool_down_m10_radio = QRadioButton("-10")
+        self.a_result_auto_tool_down_0_radio = QRadioButton("0")
+        self.a_result_auto_tool_down_p10_radio = QRadioButton("10")
+        self.a_result_auto_tool_down_p20_radio = QRadioButton("20")
+        self.a_result_auto_tool_down_p30_radio = QRadioButton("30")
+        self.a_result_auto_tool_down_p40_radio = QRadioButton("40")
 
-        self.atool_text_down_files_m40_layer2.hide()
-        self.atool_text_down_files_m30_layer2.hide()
-        self.atool_text_down_files_m20_layer2.hide()
-        self.atool_text_down_files_m10_layer2.hide()
-        self.atool_text_down_files_p10_layer2.hide()
-        self.atool_text_down_files_p20_layer2.hide()
-        self.atool_text_down_files_p30_layer2.hide()
-        self.atool_text_down_files_p40_layer2.hide()
+        self.a_result_auto_tool_down_m40_radio.hide()
+        self.a_result_auto_tool_down_m30_radio.hide()
+        self.a_result_auto_tool_down_m20_radio.hide()
+        self.a_result_auto_tool_down_m10_radio.hide()
+        self.a_result_auto_tool_down_p10_radio.hide()
+        self.a_result_auto_tool_down_p20_radio.hide()
+        self.a_result_auto_tool_down_p30_radio.hide()
+        self.a_result_auto_tool_down_p40_radio.hide()
 
-        self.atool_text_down_files_layer2_layout = QHBoxLayout()
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m40_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m30_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m20_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_m10_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_0_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p10_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p20_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p30_layer2)
-        self.atool_text_down_files_layer2_layout.addWidget(self.atool_text_down_files_p40_layer2)
+        self.a_result_auto_tool_down_layout = QHBoxLayout()
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_m40_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_m30_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_m20_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_m10_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_0_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_p10_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_p20_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_p30_radio)
+        self.a_result_auto_tool_down_layout.addWidget(self.a_result_auto_tool_down_p40_radio)
 
-        self.atool_text_down_files_layer2.setLayout(self.atool_text_down_files_layer2_layout)
+        self.a_result_auto_tool_down_widget.setLayout(self.a_result_auto_tool_down_layout)
 
                                     # Text
-        self.atext_down_layer2 = QTextEdit()
-        self.atext_down_layer2.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_down_layer2.setFont(self.font)
-        self.atext_down_layer2.setFontPointSize(18)
+        self.a_result_text_down_textedit = QTextEdit()
+        self.a_result_text_down_textedit.setStatusTip(lang.gettext("The ocr result"))
+        self.a_result_text_down_textedit.setFont(self.font)
+        self.a_result_text_down_textedit.setFontPointSize(18)
 
-        self.atooltext_down_layer2_layout = QVBoxLayout()
-        self.atooltext_down_layer2_layout.addWidget(self.atool_text_down_files_layer2)
-        self.atooltext_down_layer2_layout.addWidget(self.atext_down_layer2)
-        self.atooltext_down_layer2.setLayout(self.atooltext_down_layer2_layout)
+        self.a_result_tool_text_down_layout = QVBoxLayout()
+        self.a_result_tool_text_down_layout.addWidget(self.a_result_auto_tool_down_widget)
+        self.a_result_tool_text_down_layout.addWidget(self.a_result_text_down_textedit)
+        self.a_result_tool_text_down_widget.setLayout(self.a_result_tool_text_down_layout)
 
                             # Result layer2
-        self.atooltext_layer2_layout = QVBoxLayout()
-        self.atooltext_layer2_layout.addWidget(self.atooltext_up_layer2)
-        self.atooltext_layer2_layout.addWidget(self.atooltext_down_layer2)
+        self.a_result_auto_layer2_layout = QVBoxLayout()
+        self.a_result_auto_layer2_layout.addWidget(self.a_result_tool_text_up_widget)
+        self.a_result_auto_layer2_layout.addWidget(self.a_result_tool_text_down_widget)
 
-        self.azone_layer2_place.setLayout(self.atooltext_layer2_layout)
+        self.a_result_auto_widget2.setLayout(self.a_result_auto_layer2_layout)
 
                             # Auto manual mode
                                 # Layer1
                                     # Toolbar
-        self.atool_atext_copy1 = QPushButton(lang.gettext("Copy"))
-        self.atool_atext_copy1.setStatusTip(lang.gettext("Copy to Clipboard"))
-        self.atool_atext_copy1.setFixedWidth(100)
-        self.atool_atext_paste1 = QPushButton(lang.gettext("Paste"))
-        self.atool_atext_paste1.setStatusTip(lang.gettext("Paste from Clipboard"))
-        self.atool_atext_paste1.setFixedWidth(100)
-        self.atool_atext_clean1 = QPushButton(lang.gettext("Clean"))
-        self.atool_atext_clean1.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
-        self.atool_atext_clean1.setFixedWidth(100)
-        self.atool_atext_docx1 = QPushButton(lang.gettext("(.docx)"))
-        self.atool_atext_docx1.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
-        self.atool_atext_docx1.setFixedWidth(100)
+        self.a_result_tool_manual_copy_button1 = QPushButton(lang.gettext("Copy"))
+        self.a_result_tool_manual_copy_button1.setStatusTip(lang.gettext("Copy to Clipboard"))
+        self.a_result_tool_manual_copy_button1.setFixedWidth(100)
+        self.a_result_tool_manual_paste_button1 = QPushButton(lang.gettext("Paste"))
+        self.a_result_tool_manual_paste_button1.setStatusTip(lang.gettext("Paste from Clipboard"))
+        self.a_result_tool_manual_paste_button1.setFixedWidth(100)
+        self.a_result_tool_manual_clean_button1 = QPushButton(lang.gettext("Clean"))
+        self.a_result_tool_manual_clean_button1.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
+        self.a_result_tool_manual_clean_button1.setFixedWidth(100)
+        self.a_result_tool_manual_docx_button1 = QPushButton(lang.gettext("(.docx)"))
+        self.a_result_tool_manual_docx_button1.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
+        self.a_result_tool_manual_docx_button1.setFixedWidth(100)
 
-        self.atool_atext_group_layer1 = QHBoxLayout()
-        self.atool_atext_group_layer1.addWidget(self.atool_atext_copy1)
-        self.atool_atext_group_layer1.addWidget(self.atool_atext_clean1)
-        self.atool_atext_group_layer1.addWidget(self.atool_atext_paste1)
-        self.atool_atext_group_layer1.addWidget(self.atool_atext_docx1)
-        self.atool_atext_group1 = QGroupBox()
-        self.atool_atext_group1.setLayout(self.atool_atext_group_layer1)
-                                
+        self.a_result_tool_manual_group_layout1 = QHBoxLayout()
+        self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_copy_button1)
+        self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_clean_button1)
+        self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_paste_button1)
+        self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_docx_button1)
+        self.a_result_tool_manual_group1 = QGroupBox()
+        self.a_result_tool_manual_group1.setLayout(self.a_result_tool_manual_group_layout1)
+
                                     # QTextEdit
-        self.atext_alayer1 = QTextEdit()
-        self.atext_alayer1.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_alayer1.setFont(self.font)
-        self.atext_alayer1.setFontPointSize(18)
+        self.a_result_text_manual_textedit1 = QTextEdit()
+        self.a_result_text_manual_textedit1.setStatusTip(lang.gettext("The ocr result"))
+        self.a_result_text_manual_textedit1.setFont(self.font)
+        self.a_result_text_manual_textedit1.setFontPointSize(18)
 
                                 # Put together
-        self.atool_atext_layer1 = QVBoxLayout()
-        self.atool_atext_layer1.addWidget(self.atool_atext_group1)
-        self.atool_atext_layer1.addWidget(self.atext_alayer1)
+        self.a_result_manual_layout1 = QVBoxLayout()
+        self.a_result_manual_layout1.addWidget(self.a_result_tool_manual_group1)
+        self.a_result_manual_layout1.addWidget(self.a_result_text_manual_textedit1)
 
-        self.atext_tool_alayer1 = QWidget()
-        self.atext_tool_alayer1.setLayout(self.atool_atext_layer1)
+        self.a_result_manual_widget1 = QWidget()
+        self.a_result_manual_widget1.setLayout(self.a_result_manual_layout1)
 
                                 # Layer2
                                     # Toolbar
-        self.atool_atext_copy2 = QPushButton(lang.gettext("Copy"))
-        self.atool_atext_copy2.setStatusTip(lang.gettext("Copy to Clipboard"))
-        self.atool_atext_copy2.setFixedWidth(100)
-        self.atool_atext_paste2 = QPushButton(lang.gettext("Paste"))
-        self.atool_atext_paste2.setStatusTip(lang.gettext("Paste from Clipboard"))
-        self.atool_atext_paste2.setFixedWidth(100)
-        self.atool_atext_clean2 = QPushButton(lang.gettext("Clean"))
-        self.atool_atext_clean2.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
-        self.atool_atext_clean2.setFixedWidth(100)
-        self.atool_atext_docx2 = QPushButton(lang.gettext("(.docx)"))
-        self.atool_atext_docx2.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
-        self.atool_atext_docx2.setFixedWidth(100)
+        self.a_result_tool_manual_copy_button2 = QPushButton(lang.gettext("Copy"))
+        self.a_result_tool_manual_copy_button2.setStatusTip(lang.gettext("Copy to Clipboard"))
+        self.a_result_tool_manual_copy_button2.setFixedWidth(100)
+        self.a_result_tool_manual_paste_button2 = QPushButton(lang.gettext("Paste"))
+        self.a_result_tool_manual_paste_button2.setStatusTip(lang.gettext("Paste from Clipboard"))
+        self.a_result_tool_manual_paste_button2.setFixedWidth(100)
+        self.a_result_tool_manual_clean_button2 = QPushButton(lang.gettext("Clean"))
+        self.a_result_tool_manual_clean_button2.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
+        self.a_result_tool_manual_clean_button2.setFixedWidth(100)
+        self.a_result_tool_manual_docx_button2 = QPushButton(lang.gettext("(.docx)"))
+        self.a_result_tool_manual_docx_button2.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
+        self.a_result_tool_manual_docx_button2.setFixedWidth(100)
 
-        self.atool_atext_group_layer2 = QHBoxLayout()
-        self.atool_atext_group_layer2.addWidget(self.atool_atext_copy2)
-        self.atool_atext_group_layer2.addWidget(self.atool_atext_clean2)
-        self.atool_atext_group_layer2.addWidget(self.atool_atext_paste2)
-        self.atool_atext_group_layer2.addWidget(self.atool_atext_docx2)
-        self.atool_atext_group2 = QGroupBox()
-        self.atool_atext_group2.setLayout(self.atool_atext_group_layer2)
+        self.a_result_tool_manual_group_layout2 = QHBoxLayout()
+        self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_copy_button2)
+        self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_clean_button2)
+        self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_paste_button2)
+        self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_docx_button2)
+        self.a_result_tool_manual_group2 = QGroupBox()
+        self.a_result_tool_manual_group2.setLayout(self.a_result_tool_manual_group_layout2)
 
                                     # QTextEdit
-        self.atext_alayer2 = QTextEdit()
-        self.atext_alayer2.setStatusTip(lang.gettext("The ocr result"))
-        self.atext_alayer2.setFont(self.font)
-        self.atext_alayer2.setFontPointSize(18)
+        self.a_result_text_manual_textedit2 = QTextEdit()
+        self.a_result_text_manual_textedit2.setStatusTip(lang.gettext("The ocr result"))
+        self.a_result_text_manual_textedit2.setFont(self.font)
+        self.a_result_text_manual_textedit2.setFontPointSize(18)
 
                                 # Put together
-        self.atool_atext_layer2 = QVBoxLayout()
-        self.atool_atext_layer2.addWidget(self.atool_atext_group2)
-        self.atool_atext_layer2.addWidget(self.atext_alayer2)
+        self.a_result_manual_layout2 = QVBoxLayout()
+        self.a_result_manual_layout2.addWidget(self.a_result_tool_manual_group2)
+        self.a_result_manual_layout2.addWidget(self.a_result_text_manual_textedit2)
 
-        self.atext_tool_alayer2 = QWidget()
-        self.atext_tool_alayer2.setLayout(self.atool_atext_layer2)
+        self.a_result_manual_widget2 = QWidget()
+        self.a_result_manual_widget2.setLayout(self.a_result_manual_layout2)
 
-        self.azone_layer1_place1 = QWidget()
+                            # Stacklayers
+        self.a_result_widget1 = QWidget()
 
-        self.azone_layer1_staklayout = QStackedLayout(self.azone_layer1_place1)
-        self.azone_layer1_staklayout.addWidget(self.azone_layer1_place)
-        self.azone_layer1_staklayout.addWidget(self.atext_tool_alayer1)
-        self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
+        self.a_result_stacklayout1 = QStackedLayout(self.a_result_widget1)
+        self.a_result_stacklayout1.addWidget(self.a_result_auto_widget1)
+        self.a_result_stacklayout1.addWidget(self.a_result_manual_widget1)
+        self.a_result_stacklayout1.setCurrentWidget(self.a_result_manual_widget1)
 
-        self.azone_layer1_place1.setLayout(self.azone_layer1_staklayout)
-        self.atext_tool_alayer1.hide()
-        self.azone_layer1_place.hide()
+        self.a_result_widget1.setLayout(self.a_result_stacklayout1)
+        self.a_result_manual_widget1.hide()
+        self.a_result_auto_widget1.hide()
 
-        self.azone_layer2_place1 = QWidget()
+        self.a_result_widget2 = QWidget()
 
-        self.azone_layer2_staklayout = QStackedLayout(self.azone_layer2_place1)
-        self.azone_layer2_staklayout.addWidget(self.azone_layer2_place)
-        self.azone_layer2_staklayout.addWidget(self.atext_tool_alayer2)
-        self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
+        self.a_result_stacklayout2 = QStackedLayout(self.a_result_widget2)
+        self.a_result_stacklayout2.addWidget(self.a_result_auto_widget2)
+        self.a_result_stacklayout2.addWidget(self.a_result_manual_widget2)
+        self.a_result_stacklayout2.setCurrentWidget(self.a_result_manual_widget2)
 
-        self.azone_layer2_place1.setLayout(self.azone_layer1_staklayout)
-        self.atext_tool_alayer2.hide()
-        self.azone_layer2_place.hide()
+        self.a_result_widget2.setLayout(self.a_result_stacklayout1)
+        self.a_result_manual_widget2.hide()
+        self.a_result_auto_widget2.hide()
 
                     # Image-text layout and widget
-        self.aimagetext_ahlayout = QHBoxLayout()
-        self.aimagetext_avlayout = QVBoxLayout()
+        self.a_h_layout = QHBoxLayout()
+        self.a_v_layout = QVBoxLayout()
 
-        self.aimagetext_avlayout.addWidget(self.ascan_image_layer1)
-        self.aimagetext_avlayout.addWidget(self.azone_layer1_place1)
+        self.a_v_layout.addWidget(self.a_scan_image_label1)
+        self.a_v_layout.addWidget(self.a_result_widget1)
 
-        self.aimagetext_ahlayout.addWidget(self.ascan_image_layer2)
-        self.aimagetext_ahlayout.addWidget(self.azone_layer2_place1)
+        self.a_h_layout.addWidget(self.a_scan_image_label2)
+        self.a_h_layout.addWidget(self.a_result_widget2)
 
-        self.aimagetext_widget = QWidget()
-        self.aimagetext_ahwidget = QWidget()
-        self.aimagetext_avwidget = QWidget()
+        self.a_widget = QWidget()
+        self.a_h_widget = QWidget()
+        self.a_v_widget = QWidget()
 
-        self.aimagetext_avwidget.setLayout(self.aimagetext_avlayout)
-        self.aimagetext_ahwidget.setLayout(self.aimagetext_ahlayout)
+        self.a_v_widget.setLayout(self.a_v_layout)
+        self.a_h_widget.setLayout(self.a_h_layout)
 
-        self.aimagetext_staklayout = QStackedLayout(self.aimagetext_widget)
-        self.aimagetext_staklayout.addWidget(self.aimagetext_ahwidget)
-        self.aimagetext_staklayout.addWidget(self.aimagetext_avwidget)
-        self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
+        self.a_staklayout = QStackedLayout(self.a_widget)
+        self.a_staklayout.addWidget(self.a_h_widget)
+        self.a_staklayout.addWidget(self.a_v_widget)
+        self.a_staklayout.setCurrentWidget(self.a_v_widget)
 
-        self.aimagetext_widget.setLayout(self.aimagetext_staklayout)
+        self.a_widget.setLayout(self.a_staklayout)
 
                 # Ocr page layout & widget
         self.auto_layout = QVBoxLayout()
-        self.auto_layout.addWidget(self.aoption_widget)
-        self.auto_layout.addWidget(self.aimagetext_widget)
+        self.auto_layout.addWidget(self.a_option_widget)
+        self.auto_layout.addWidget(self.a_widget)
 
         self.autopage_widget = QWidget()
         self.autopage_widget.setLayout(self.auto_layout)
@@ -749,266 +747,266 @@ class NamselOcr(QMainWindow):
                 # Preprocess page
                     # Option
                         # Pecha - Book radiobuttons
-        self.ppecha_button = QRadioButton(lang.gettext("Pecha"))
-        self.ppecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
-        self.pbook_button = QRadioButton(lang.gettext("Book"))
-        self.pbook_button.setStatusTip(lang.gettext("The scan image is a book"))
-        self.ppecha_button.setCheckable(True)
-        self.pbook_button.setCheckable(True)
-        self.ppecha_button.setChecked(True)
+        self.p_pecha_button = QRadioButton(lang.gettext("Pecha"))
+        self.p_pecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
+        self.p_book_button = QRadioButton(lang.gettext("Book"))
+        self.p_book_button.setStatusTip(lang.gettext("The scan image is a book"))
+        self.p_pecha_button.setCheckable(True)
+        self.p_book_button.setCheckable(True)
+        self.p_pecha_button.setChecked(True)
 
-        self.ppecha_book_layout = QVBoxLayout()
-        self.ppecha_book_layout.addWidget(self.ppecha_button)
-        self.ppecha_book_layout.addWidget(self.pbook_button)
+        self.p_pecha_book_layout = QVBoxLayout()
+        self.p_pecha_book_layout.addWidget(self.p_pecha_button)
+        self.p_pecha_book_layout.addWidget(self.p_book_button)
 
-        self.ppecha_book_group = QGroupBox()
-        self.ppecha_book_group.setLayout(self.ppecha_book_layout)
+        self.p_pecha_book_group = QGroupBox()
+        self.p_pecha_book_group.setLayout(self.p_pecha_book_layout)
 
                         # Label and the thickness value
-        self.psliderlabel_val = QLabel(lang.gettext("Thickness: "))
-        self.plcd = QLCDNumber()
-        self.plcd.setStatusTip(lang.gettext("The thickness value during the preprocess"))
-        self.plcd.setSegmentStyle(QLCDNumber.Flat)
-        self.plcd.setFixedWidth(40)
+        self.p_slabel = QLabel(lang.gettext("Thickness: "))
+        self.p_slcd = QLCDNumber()
+        self.p_slcd.setStatusTip(lang.gettext("The thickness value during the preprocess"))
+        self.p_slcd.setSegmentStyle(QLCDNumber.Flat)
+        self.p_slcd.setFixedWidth(40)
 
-        self.pslider_label_num_layout = QHBoxLayout()
-        self.pslider_label_num_layout.addWidget(self.psliderlabel_val)
-        self.pslider_label_num_layout.addWidget(self.plcd)
-        self.pslider_label_num_layout.setAlignment(Qt.AlignCenter)
+        self.p_slabel_slider_layout = QHBoxLayout()
+        self.p_slabel_slider_layout.addWidget(self.p_slabel)
+        self.p_slabel_slider_layout.addWidget(self.p_slcd)
+        self.p_slabel_slider_layout.setAlignment(Qt.AlignCenter)
 
                         # Thickness slider
-        self.pslider = QSlider(Qt.Horizontal)
-        self.pslider.setRange(-40, 40)
-        self.pslider.setSingleStep(1)
-        self.pslider.setTickPosition(QSlider.TicksBelow)
-        self.pslider.setTickInterval(5)
-        self.pslider.setStatusTip(lang.gettext("Set the thickness of the scan image"))
+        self.p_slider = QSlider(Qt.Horizontal)
+        self.p_slider.setRange(-40, 40)
+        self.p_slider.setSingleStep(1)
+        self.p_slider.setTickPosition(QSlider.TicksBelow)
+        self.p_slider.setTickInterval(5)
+        self.p_slider.setStatusTip(lang.gettext("Set the thickness of the scan image"))
 
-        self.pslider_layout = QVBoxLayout()
-        self.pslider_layout.addLayout(self.pslider_label_num_layout)
-        self.pslider_layout.addWidget(self.pslider)
+        self.p_slider_layout = QVBoxLayout()
+        self.p_slider_layout.addLayout(self.p_slabel_slider_layout)
+        self.p_slider_layout.addWidget(self.p_slider)
 
-        self.pslider_group = QGroupBox()
-        self.pslider_group.setLayout(self.pslider_layout)
+        self.p_slider_group = QGroupBox()
+        self.p_slider_group.setLayout(self.p_slider_layout)
 
                         # Run the Preprocess
-        self.pdouble_page = QCheckBox(lang.gettext("Double page"))
-        self.pdouble_page.setStatusTip(lang.gettext("The scan image is a double page"))
-        self.prun_button = QPushButton(lang.gettext("Run"))
-        self.prun_button.setStatusTip(lang.gettext("Run the preprocess"))
+        self.p_doublepage_checkbox = QCheckBox(lang.gettext("Double page"))
+        self.p_doublepage_checkbox.setStatusTip(lang.gettext("The scan image is a double page"))
+        self.p_run_button = QPushButton(lang.gettext("Run"))
+        self.p_run_button.setStatusTip(lang.gettext("Run the preprocess"))
 
-        self.pd_layout = QHBoxLayout()
-        self.pd_layout.addWidget(self.pdouble_page)
+        self.p_doublepage_layout = QHBoxLayout()
+        self.p_doublepage_layout.addWidget(self.p_doublepage_checkbox)
 
-        self.pd_widget = QWidget()
-        self.pd_widget.setLayout(self.pd_layout)
-        self.pd_widget.hide()
+        self.p_doublepage_widget = QWidget()
+        self.p_doublepage_widget.setLayout(self.p_doublepage_layout)
+        self.p_doublepage_widget.hide()
 
-        self.prun_layout = QVBoxLayout()
-        self.prun_layout.addWidget(self.pd_widget)
-        self.prun_layout.addWidget(self.prun_button)
+        self.p_run_layout = QVBoxLayout()
+        self.p_run_layout.addWidget(self.p_doublepage_widget)
+        self.p_run_layout.addWidget(self.p_run_button)
 
-        self.prun_group = QGroupBox()
-        self.prun_group.setLayout(self.prun_layout)
+        self.p_run_group = QGroupBox()
+        self.p_run_group.setLayout(self.p_run_layout)
 
                     # Option layout & widget
-        self.poption_layout = QHBoxLayout()
-        self.poption_layout.addWidget(self.ppecha_book_group)
-        self.poption_layout.addWidget(self.pslider_group)
-        self.poption_layout.addWidget(self.prun_group)
+        self.p_option_layout = QHBoxLayout()
+        self.p_option_layout.addWidget(self.p_pecha_book_group)
+        self.p_option_layout.addWidget(self.p_slider_group)
+        self.p_option_layout.addWidget(self.p_run_group)
 
-        self.poption_widget = QWidget()
-        self.poption_widget.setFixedHeight(160)
-        self.poption_widget.setLayout(self.poption_layout)
+        self.p_option_widget = QWidget()
+        self.p_option_widget.setFixedHeight(160)
+        self.p_option_widget.setLayout(self.p_option_layout)
 
                     # Image
                         # Scan image widget
-        self.pscan_image_layer1 = QLabel()
-        self.pscan_image_layer2 = QLabel()
-        self.pscan_image_layer1.setStatusTip(lang.gettext("The scan image"))
-        self.pscan_image_layer2.setStatusTip(lang.gettext("The scan image"))
+        self.p_scan_image_label1 = QLabel()
+        self.p_scan_image_label2 = QLabel()
+        self.p_scan_image_label1.setStatusTip(lang.gettext("The scan image"))
+        self.p_scan_image_label2.setStatusTip(lang.gettext("The scan image"))
 
                         # Result image widget
-        self.presult_image_layer1 = QLabel()
-        self.presult_image_layer2 = QLabel()
-        self.presult_image_layer1.setStatusTip(lang.gettext("The result 'scantailored' image"))
-        self.presult_image_layer2.setStatusTip(lang.gettext("The result 'scantailored' image"))
+        self.p_result_image_label1 = QLabel()
+        self.p_result_image_label2 = QLabel()
+        self.p_result_image_label1.setStatusTip(lang.gettext("The result 'scantailored' image"))
+        self.p_result_image_label2.setStatusTip(lang.gettext("The result 'scantailored' image"))
 
                     # Image layout & widget
-        self.pimage_hlayout = QHBoxLayout()
-        self.pimage_vlayout = QVBoxLayout()
+        self.p_h_layout = QHBoxLayout()
+        self.p_v_layout = QVBoxLayout()
 
-        self.pimage_vlayout.addWidget(self.pscan_image_layer1)
-        self.pimage_vlayout.addWidget(self.presult_image_layer1)
+        self.p_v_layout.addWidget(self.p_scan_image_label1)
+        self.p_v_layout.addWidget(self.p_result_image_label1)
 
-        self.pimage_hlayout.addWidget(self.pscan_image_layer2)
-        self.pimage_hlayout.addWidget(self.presult_image_layer2)
+        self.p_h_layout.addWidget(self.p_scan_image_label2)
+        self.p_h_layout.addWidget(self.p_result_image_label2)
 
-        self.pimage_widget = QWidget()
-        self.pimage_vwidget = QWidget()
-        self.pimage_hwidget = QWidget()
+        self.p_widget = QWidget()
+        self.p_v_widget = QWidget()
+        self.p_h_widget = QWidget()
 
-        self.pimage_vwidget.setLayout(self.pimage_vlayout)
-        self.pimage_hwidget.setLayout(self.pimage_hlayout)
+        self.p_v_widget.setLayout(self.p_v_layout)
+        self.p_h_widget.setLayout(self.p_h_layout)
 
-        self.pimage_staklayout = QStackedLayout(self.pimage_widget)
-        self.pimage_staklayout.addWidget(self.pimage_vwidget)
-        self.pimage_staklayout.addWidget(self.pimage_hwidget)
-        self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
+        self.p_staklayout = QStackedLayout(self.p_widget)
+        self.p_staklayout.addWidget(self.p_v_widget)
+        self.p_staklayout.addWidget(self.p_h_widget)
+        self.p_staklayout.setCurrentWidget(self.p_v_widget)
 
-        self.pimage_widget.setLayout(self.pimage_staklayout)
+        self.p_widget.setLayout(self.p_staklayout)
 
                 # Preprocess page layout & widget
         self.prep_layout = QVBoxLayout()
-        self.prep_layout.addWidget(self.poption_widget)
-        self.prep_layout.addWidget(self.pimage_widget)
+        self.prep_layout.addWidget(self.p_option_widget)
+        self.prep_layout.addWidget(self.p_widget)
 
-        self.preprocesspage_widget = QWidget()
-        self.preprocesspage_widget.setLayout(self.prep_layout)
+        self.prep_widget = QWidget()
+        self.prep_widget.setLayout(self.prep_layout)
 
                 # Ocr page options
                     # Option
                         # Pecha - Book radiobuttons
-        self.opecha_button = QRadioButton(lang.gettext("Pecha"))
-        self.opecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
-        self.obook_button = QRadioButton(lang.gettext("Book"))
-        self.obook_button.setStatusTip(lang.gettext("The scan image is a book"))
-        self.opecha_button.setCheckable(True)
-        self.obook_button.setCheckable(True)
-        self.opecha_button.setChecked(True)
+        self.o_pecha_button = QRadioButton(lang.gettext("Pecha"))
+        self.o_pecha_button.setStatusTip(lang.gettext("The scan image is a pecha"))
+        self.o_book_button = QRadioButton(lang.gettext("Book"))
+        self.o_book_button.setStatusTip(lang.gettext("The scan image is a book"))
+        self.o_pecha_button.setCheckable(True)
+        self.o_book_button.setCheckable(True)
+        self.o_pecha_button.setChecked(True)
 
-        self.opecha_book_layout = QVBoxLayout()
-        self.opecha_book_layout.addWidget(self.opecha_button)
-        self.opecha_book_layout.addWidget(self.obook_button)
+        self.o_pecha_book_layout = QVBoxLayout()
+        self.o_pecha_book_layout.addWidget(self.o_pecha_button)
+        self.o_pecha_book_layout.addWidget(self.o_book_button)
 
-        self.opecha_book_group = QGroupBox()
-        self.opecha_book_group.setLayout(self.opecha_book_layout)
+        self.o_pecha_book_group = QGroupBox()
+        self.o_pecha_book_group.setLayout(self.o_pecha_book_layout)
 
                         # Low ink
-        self.olowink = QCheckBox(lang.gettext("Low ink"))
-        self.olowink.setStatusTip(lang.gettext("Check if the scan image is a bit of low quality"))
+        self.o_lowink_checkbox = QCheckBox(lang.gettext("Low ink"))
+        self.o_lowink_checkbox.setStatusTip(lang.gettext("Check if the scan image is a bit of low quality"))
 
-        self.olowink_layout = QVBoxLayout()
-        self.olowink_layout.addWidget(self.olowink)
+        self.o_lowink_layout = QVBoxLayout()
+        self.o_lowink_layout.addWidget(self.o_lowink_checkbox)
 
-        self.olowink_group = QGroupBox()
-        self.olowink_group.setLayout(self.olowink_layout)
+        self.o_lowink_group = QGroupBox()
+        self.o_lowink_group.setLayout(self.o_lowink_layout)
 
                         # Label and the dial value
-        self.odialabel_val = QLabel(lang.gettext("Break width: "))
-        self.olcd = QLCDNumber()
-        self.olcd.setStatusTip(lang.gettext("The break-Width value"))
-        self.olcd.setSegmentStyle(QLCDNumber.Flat)
-        self.olcd.setFixedWidth(40)
-        self.olcd.display(lang.gettext("Off"))
+        self.o_dialabel_label = QLabel(lang.gettext("Break width: "))
+        self.o_dlcd = QLCDNumber()
+        self.o_dlcd.setStatusTip(lang.gettext("The break-Width value"))
+        self.o_dlcd.setSegmentStyle(QLCDNumber.Flat)
+        self.o_dlcd.setFixedWidth(40)
+        self.o_dlcd.display(lang.gettext("Off"))
 
-        self.odial_label_num_layout = QHBoxLayout()
-        self.odial_label_num_layout.addWidget(self.odialabel_val)
-        self.odial_label_num_layout.addWidget(self.olcd)
-        self.odial_label_num_layout.setAlignment(Qt.AlignCenter)
+        self.o_diallabel_dial_layout = QHBoxLayout()
+        self.o_diallabel_dial_layout.addWidget(self.o_dialabel_label)
+        self.o_diallabel_dial_layout.addWidget(self.o_dlcd)
+        self.o_diallabel_dial_layout.setAlignment(Qt.AlignCenter)
 
                         # QDial
-        self.odial = QDial()
-        self.odial.setRange(0, 8)
-        self.odial.setNotchesVisible(True)
-        self.odial.setStatusTip(lang.gettext("To controls how horizontally-connected stacks will be segmented"))
+        self.o_dial = QDial()
+        self.o_dial.setRange(0, 8)
+        self.o_dial.setNotchesVisible(True)
+        self.o_dial.setStatusTip(lang.gettext("To controls how horizontally-connected stacks will be segmented"))
 
-        self.odial_layout = QHBoxLayout()
-        self.odial_layout.addLayout(self.odial_label_num_layout)
-        self.odial_layout.addWidget(self.odial)
+        self.o_dial_layout = QHBoxLayout()
+        self.o_dial_layout.addLayout(self.o_diallabel_dial_layout)
+        self.o_dial_layout.addWidget(self.o_dial)
 
-        self.odial_group = QGroupBox()
-        self.odial_group.setLayout(self.odial_layout)
+        self.o_dial_group = QGroupBox()
+        self.o_dial_group.setLayout(self.o_dial_layout)
 
                         # Run the Ocr
-        self.oclearhr = QCheckBox(lang.gettext("Clear HR"))
-        self.oclearhr.setStatusTip(lang.gettext("The scan image is a double page"))
-        self.orun_button = QPushButton(lang.gettext("Run"))
-        self.orun_button.setStatusTip(lang.gettext("Run the ocr"))
+        self.o_clearhr_checkbox = QCheckBox(lang.gettext("Clear HR"))
+        self.o_clearhr_checkbox.setStatusTip(lang.gettext("The scan image is a double page"))
+        self.o_run_button = QPushButton(lang.gettext("Run"))
+        self.o_run_button.setStatusTip(lang.gettext("Run the ocr"))
 
-        self.od_layout = QHBoxLayout()
-        self.od_layout.addWidget(self.oclearhr)
+        self.o_clearhr_layout = QHBoxLayout()
+        self.o_clearhr_layout.addWidget(self.o_clearhr_checkbox)
 
-        self.od_widget = QWidget()
-        self.od_widget.setLayout(self.od_layout)
-        self.od_widget.hide()
+        self.o_clearhr_widget = QWidget()
+        self.o_clearhr_widget.setLayout(self.o_clearhr_layout)
+        self.o_clearhr_widget.hide()
 
-        self.orun_layout = QVBoxLayout()
-        self.orun_layout.addWidget(self.od_widget)
-        self.orun_layout.addWidget(self.orun_button)
+        self.o_run_layout = QVBoxLayout()
+        self.o_run_layout.addWidget(self.o_clearhr_widget)
+        self.o_run_layout.addWidget(self.o_run_button)
 
-        self.orun_group = QGroupBox()
-        self.orun_group.setLayout(self.orun_layout)
+        self.o_run_group = QGroupBox()
+        self.o_run_group.setLayout(self.o_run_layout)
 
                     # Option layout & widget
-        self.ooption_layout = QHBoxLayout()
-        self.ooption_layout.addWidget(self.opecha_book_group)
-        self.ooption_layout.addWidget(self.olowink_group)
-        self.ooption_layout.addWidget(self.odial_group)
-        self.ooption_layout.addWidget(self.orun_group)
+        self.o_option_layout = QHBoxLayout()
+        self.o_option_layout.addWidget(self.o_pecha_book_group)
+        self.o_option_layout.addWidget(self.o_lowink_group)
+        self.o_option_layout.addWidget(self.o_dial_group)
+        self.o_option_layout.addWidget(self.o_run_group)
 
-        self.ooption_widget = QWidget()
-        self.ooption_widget.setFixedHeight(160)
-        self.ooption_widget.setLayout(self.ooption_layout)
+        self.o_option_widget = QWidget()
+        self.o_option_widget.setFixedHeight(160)
+        self.o_option_widget.setLayout(self.o_option_layout)
 
                     # Image-text
                         # Scan image widget
-        self.oscan_image_layer1 = QLabel()
-        self.oscan_image_layer2 = QLabel()
-        self.oscan_image_layer1.setStatusTip(lang.gettext("The scan image"))
-        self.oscan_image_layer2.setStatusTip(lang.gettext("The scan image"))
+        self.o_scan_image_label1 = QLabel()
+        self.o_scan_image_label2 = QLabel()
+        self.o_scan_image_label1.setStatusTip(lang.gettext("The scan image"))
+        self.o_scan_image_label2.setStatusTip(lang.gettext("The scan image"))
 
                         # Result text widget
-        self.otext_layer1 = QTextEdit()
-        self.otext_layer2 = QTextEdit()
-        self.otext_layer1.setStatusTip(lang.gettext("The ocr result"))
-        self.otext_layer2.setStatusTip(lang.gettext("The ocr result"))
-        self.otext_layer1.setFont(self.font)
-        self.otext_layer2.setFont(self.font)
-        self.otext_layer1.setFontPointSize(18)
-        self.otext_layer2.setFontPointSize(18)
-        self.otext_layer1.hide()
-        self.otext_layer2.hide()
+        self.o_textedit1 = QTextEdit()
+        self.o_textedit2 = QTextEdit()
+        self.o_textedit1.setStatusTip(lang.gettext("The ocr result"))
+        self.o_textedit2.setStatusTip(lang.gettext("The ocr result"))
+        self.o_textedit1.setFont(self.font)
+        self.o_textedit2.setFont(self.font)
+        self.o_textedit1.setFontPointSize(18)
+        self.o_textedit2.setFontPointSize(18)
+        self.o_textedit1.hide()
+        self.o_textedit2.hide()
 
                     # Image-text layout and widget
-        self.oimagetext_hlayout = QHBoxLayout()
-        self.oimagetext_vlayout = QVBoxLayout()
+        self.o_h_layout = QHBoxLayout()
+        self.o_v_layout = QVBoxLayout()
 
-        self.oimagetext_vlayout.addWidget(self.oscan_image_layer1)
-        self.oimagetext_vlayout.addWidget(self.otext_layer1)
+        self.o_v_layout.addWidget(self.o_scan_image_label1)
+        self.o_v_layout.addWidget(self.o_textedit1)
 
-        self.oimagetext_hlayout.addWidget(self.oscan_image_layer2)
-        self.oimagetext_hlayout.addWidget(self.otext_layer2)
+        self.o_h_layout.addWidget(self.o_scan_image_label2)
+        self.o_h_layout.addWidget(self.o_textedit2)
 
-        self.oimagetext_widget = QWidget()
-        self.oimagetext_vwidget = QWidget()
-        self.oimagetext_hwidget = QWidget()
+        self.o_widget = QWidget()
+        self.o_v_widget = QWidget()
+        self.o_h_widget = QWidget()
 
-        self.oimagetext_vwidget.setLayout(self.oimagetext_vlayout)
-        self.oimagetext_hwidget.setLayout(self.oimagetext_hlayout)
+        self.o_v_widget.setLayout(self.o_v_layout)
+        self.o_h_widget.setLayout(self.o_h_layout)
 
-        self.oimagetext_staklayout = QStackedLayout(self.oimagetext_widget)
-        self.oimagetext_staklayout.addWidget(self.oimagetext_vwidget)
-        self.oimagetext_staklayout.addWidget(self.oimagetext_hwidget)
-        self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
+        self.o_staklayout = QStackedLayout(self.o_widget)
+        self.o_staklayout.addWidget(self.o_v_widget)
+        self.o_staklayout.addWidget(self.o_h_widget)
+        self.o_staklayout.setCurrentWidget(self.o_v_widget)
 
-        self.oimagetext_widget.setLayout(self.oimagetext_staklayout)
+        self.o_widget.setLayout(self.o_staklayout)
 
                 # Ocr page layout & widget
         self.ocr_layout = QVBoxLayout()
-        self.ocr_layout.addWidget(self.ooption_widget)
-        self.ocr_layout.addWidget(self.oimagetext_widget)
+        self.ocr_layout.addWidget(self.o_option_widget)
+        self.ocr_layout.addWidget(self.o_widget)
 
-        self.ocrpage_widget = QWidget()
-        self.ocrpage_widget.setLayout(self.ocr_layout)
+        self.ocr_widget = QWidget()
+        self.ocr_widget.setLayout(self.ocr_layout)
 
             # Joining all the pages together
         self.page_widget = QWidget()
         self.page_staklayout = QStackedLayout(self.page_widget)
         self.page_staklayout.addWidget(self.autopage_widget)
-        self.page_staklayout.addWidget(self.preprocesspage_widget)
-        self.page_staklayout.addWidget(self.ocrpage_widget)
-        self.page_staklayout.setCurrentWidget(self.preprocesspage_widget)
+        self.page_staklayout.addWidget(self.prep_widget)
+        self.page_staklayout.addWidget(self.ocr_widget)
+        self.page_staklayout.setCurrentWidget(self.prep_widget)
 
         # Showing the default page on screen
         self.setCentralWidget(self.page_widget)
@@ -1031,116 +1029,119 @@ class NamselOcr(QMainWindow):
         self.lang_subactiongroup.triggered.connect(self.lang)
             # Auto mode
         self.auto_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.autopage_widget))
-        self.aslider.valueChanged.connect(self.aslcd.display)
-        self.amanual_button1.released.connect(self.autoManual)
-        self.amanual_button2.released.connect(self.autoAuto)
-        self.adial.valueChanged.connect(lambda x: self.alcd.display(x / 2) if x else self.alcd.display("Off"))
-        self.abook_button.toggled.connect(self.pechabook)
-        self.adouble_page.toggled.connect(self.double)
-        self.arun_button.released.connect(self.autoRun)
+        self.a_option_manual_slider.valueChanged.connect(self.a_option_manual_sliderlcd.display)
+        self.a_option_auto_tomanual_button.released.connect(self.autoManual)
+        self.a_option_auto_toauto_button.released.connect(self.autoAuto)
+        self.a_option_dial.valueChanged.connect(lambda x: self.a_option_diallcd.display(x / 2) if x else self.a_option_diallcd.display("Off"))
+        self.a_option_book_button.toggled.connect(self.pechabook)
+        self.a_option_double_page_check.toggled.connect(self.double)
+        self.a_option_run_button.released.connect(self.autoRun)
 
-        self.atool_text_left_files_m40_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-40", x))
-        self.atool_text_left_files_m30_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-30", x))
-        self.atool_text_left_files_m20_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-20", x))
-        self.atool_text_left_files_m10_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "-10", x))
-        self.atool_text_left_files_0_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "0", x))
-        self.atool_text_left_files_p10_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "10", x))
-        self.atool_text_left_files_p20_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "20", x))
-        self.atool_text_left_files_p30_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "30", x))
-        self.atool_text_left_files_p40_layer1.toggled.connect(lambda x: self.comparison(self.atext_left_layer1, "40", x))
+        self.a_result_auto_tool_left_m40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "-40", x))
+        self.a_result_auto_tool_left_m30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "-30", x))
+        self.a_result_auto_tool_left_m20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "-20", x))
+        self.a_result_auto_tool_left_m10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "-10", x))
+        self.a_result_auto_tool_left_0_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "0", x))
+        self.a_result_auto_tool_left_p10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "10", x))
+        self.a_result_auto_tool_left_p20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "20", x))
+        self.a_result_auto_tool_left_p30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "30", x))
+        self.a_result_auto_tool_left_p40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_left_textedit, "40", x))
 
-        self.atool_text_right_files_m40_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-40", x))
-        self.atool_text_right_files_m30_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-30", x))
-        self.atool_text_right_files_m20_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-20", x))
-        self.atool_text_right_files_m10_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "-10", x))
-        self.atool_text_right_files_0_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "0", x))
-        self.atool_text_right_files_p10_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "10", x))
-        self.atool_text_right_files_p20_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "20", x))
-        self.atool_text_right_files_p30_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "30", x))
-        self.atool_text_right_files_p40_layer1.toggled.connect(lambda x: self.comparison(self.atext_right_layer1, "40", x))
+        self.a_result_auto_tool_right_m40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "-40", x))
+        self.a_result_auto_tool_right_m30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "-30", x))
+        self.a_result_auto_tool_right_m20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "-20", x))
+        self.a_result_auto_tool_right_m10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "-10", x))
+        self.a_result_auto_tool_right_0_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "0", x))
+        self.a_result_auto_tool_right_p10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "10", x))
+        self.a_result_auto_tool_right_p20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "20", x))
+        self.a_result_auto_tool_right_p30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "30", x))
+        self.a_result_auto_tool_right_p40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_right_textedit, "40", x))
 
-        self.atool_text_up_files_m40_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-40", x))
-        self.atool_text_up_files_m30_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-30", x))
-        self.atool_text_up_files_m20_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-20", x))
-        self.atool_text_up_files_m10_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "-10", x))
-        self.atool_text_up_files_0_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "0", x))
-        self.atool_text_up_files_p10_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "10", x))
-        self.atool_text_up_files_p20_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "20", x))
-        self.atool_text_up_files_p30_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "30", x))
-        self.atool_text_up_files_p40_layer2.toggled.connect(lambda x: self.comparison(self.atext_up_layer2, "40", x))
+        self.a_result_auto_tool_up_m40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "-40", x))
+        self.a_result_auto_tool_up_m30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "-30", x))
+        self.a_result_auto_tool_up_m20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "-20", x))
+        self.a_result_auto_tool_up_m10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "-10", x))
+        self.a_result_auto_tool_up_0_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "0", x))
+        self.a_result_auto_tool_up_p10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "10", x))
+        self.a_result_auto_tool_up_p20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "20", x))
+        self.a_result_auto_tool_up_p30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "30", x))
+        self.a_result_auto_tool_up_p40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_up_textedit, "40", x))
 
-        self.atool_text_down_files_m40_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-40", x))
-        self.atool_text_down_files_m30_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-30", x))
-        self.atool_text_down_files_m20_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-20", x))
-        self.atool_text_down_files_m10_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "-10", x))
-        self.atool_text_down_files_0_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "0", x))
-        self.atool_text_down_files_p10_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "10", x))
-        self.atool_text_down_files_p20_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "20", x))
-        self.atool_text_down_files_p30_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "30", x))
-        self.atool_text_down_files_p40_layer2.toggled.connect(lambda x: self.comparison(self.atext_down_layer2, "40", x))
+        self.a_result_auto_tool_down_m40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "-40", x))
+        self.a_result_auto_tool_down_m30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "-30", x))
+        self.a_result_auto_tool_down_m20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "-20", x))
+        self.a_result_auto_tool_down_m10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "-10", x))
+        self.a_result_auto_tool_down_0_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "0", x))
+        self.a_result_auto_tool_down_p10_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "10", x))
+        self.a_result_auto_tool_down_p20_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "20", x))
+        self.a_result_auto_tool_down_p30_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "30", x))
+        self.a_result_auto_tool_down_p40_radio.toggled.connect(lambda x: self.comparison(self.a_result_text_down_textedit, "40", x))
 
-        self.atool_atext_copy1.released.connect(self.copy)
-        self.atool_atext_copy2.released.connect(self.copy)
-        self.atool_atext_clean1.released.connect(self.clean)
-        self.atool_atext_clean2.released.connect(self.clean)
-        self.atool_atext_paste1.released.connect(self.paste)
-        self.atool_atext_paste2.released.connect(self.paste)
-        self.atool_atext_docx1.released.connect(self.docx)
-        self.atool_atext_docx2.released.connect(self.docx)
+        self.a_result_tool_manual_copy_button1.released.connect(self.copy)
+        self.a_result_tool_manual_copy_button2.released.connect(self.copy)
+        self.a_result_tool_manual_clean_button1.released.connect(self.clean)
+        self.a_result_tool_manual_clean_button2.released.connect(self.clean)
+        self.a_result_tool_manual_paste_button1.released.connect(self.paste)
+        self.a_result_tool_manual_paste_button2.released.connect(self.paste)
+        self.a_result_tool_manual_docx_button1.released.connect(self.docx)
+        self.a_result_tool_manual_docx_button2.released.connect(self.docx)
 
             # Preprocess mode
-        self.prep_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.preprocesspage_widget))
-        self.pslider.valueChanged.connect(self.plcd.display)
-        self.pbook_button.toggled.connect(self.pechabook)
-        self.pdouble_page.toggled.connect(self.double)
-        self.prun_button.released.connect(self.preprocessRun)
+        self.prep_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.prep_widget))
+        self.p_slider.valueChanged.connect(self.p_slcd.display)
+        self.p_book_button.toggled.connect(self.pechabook)
+        self.p_doublepage_checkbox.toggled.connect(self.double)
+        self.p_run_button.released.connect(self.preprocessRun)
             # Ocr mode
-        self.ocr_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.ocrpage_widget))
-        self.odial.valueChanged.connect(lambda x: self.olcd.display(x/2) if x else self.olcd.display("Off"))
-        self.obook_button.toggled.connect(self.pechabook)
-        self.orun_button.released.connect(self.ocrRun)
+        self.ocr_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.ocr_widget))
+        self.o_dial.valueChanged.connect(lambda x: self.o_dlcd.display(x / 2) if x else self.o_dlcd.display("Off"))
+        self.o_book_button.toggled.connect(self.pechabook)
+        self.o_run_button.released.connect(self.ocrRun)
             # Docker
         docker.docker_process.finished.connect(self.processFinished)
 
     def autoManual(self):
-        self.aswitch_layer.setCurrentWidget(self.amanual_place2)
-        self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
-        self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
-        if self.atext_alayer1.toPlainText() == "":
-            self.atext_tool_alayer1.hide()
-            self.atext_tool_alayer2.hide()
+        self.a_option_manual_auto_switch_layout.setCurrentWidget(self.a_option_manual_slider_toauto_widget)
+        self.a_result_stacklayout1.setCurrentWidget(self.a_result_manual_widget1)
+        self.a_result_stacklayout2.setCurrentWidget(self.a_result_manual_widget2)
+
+        if self.a_result_text_manual_textedit1.toPlainText() == "":
+            self.a_result_manual_widget1.hide()
+            self.a_result_manual_widget2.hide()
 
     def autoAuto(self):
-        self.aswitch_layer.setCurrentWidget(self.amanual_place1)
-        self.azone_layer1_staklayout.setCurrentWidget(self.azone_layer1_place)
-        self.azone_layer2_staklayout.setCurrentWidget(self.azone_layer2_place)
-        if self.atext_left_layer1.toPlainText() == "":
-            self.azone_layer1_place.hide()
-            self.azone_layer2_place.hide()
+        self.a_option_manual_auto_switch_layout.setCurrentWidget(self.a_option_auto_choice_tomanual_widget)
+        self.a_result_stacklayout1.setCurrentWidget(self.a_result_auto_widget1)
+        self.a_result_stacklayout2.setCurrentWidget(self.a_result_auto_widget2)
+
+        if self.a_result_text_left_textedit.toPlainText() == "":
+            self.a_result_auto_widget1.hide()
+            self.a_result_auto_widget2.hide()
 
     def copy(self):
-        data = self.atext_alayer1.toPlainText()
+        data = self.a_result_text_manual_textedit1.toPlainText()
         QApplication.clipboard().setText(data)
 
     def clean(self):
-        data = self.atext_alayer1.toPlainText()
-        data = re.sub(r"(OCR text\n)|(\n.*?.tif\n)|(་)\n|\n\n", r"\3", data)
-        data = re.sub(r"([ག།])\n", r"\1 ", data)
-        data = re.sub(r"(༄|.༅)", r"\n\1", data)
-        self.otext_layer1.setText(data)
-        self.otext_layer2.setText(data)
-        self.atext_alayer1.setText(data)
-        self.atext_alayer2.setText(data)
+        data = self.a_result_text_manual_textedit1.toPlainText()
+        data = sub(r"(OCR text\n)|(\n.*?.tif\n)|(་)\n", r"\3", data)
+        data = sub(r"([ག།])\n", r"\1 ", data)
+        data = sub(r"\n\n", "", data)
+        data = sub(r"(༄|.༅)", r"\n\1", data)
+        self.o_textedit1.setText(data)
+        self.o_textedit2.setText(data)
+        self.a_result_text_manual_textedit1.setText(data)
+        self.a_result_text_manual_textedit2.setText(data)
 
     def paste(self):
         data = QApplication.clipboard().text()
-        self.otext_layer1.setText(data)
-        self.otext_layer2.setText(data)
-        self.atext_alayer1.setText(data)
-        self.atext_alayer2.setText(data)
+        self.o_textedit1.setText(data)
+        self.o_textedit2.setText(data)
+        self.a_result_text_manual_textedit1.setText(data)
+        self.a_result_text_manual_textedit2.setText(data)
 
     def docx(self):
-        data = self.atext_alayer1.toPlainText()
+        data = self.a_result_text_manual_textedit1.toPlainText()
         word_file = docx.Document()
         word_file.add_paragraph(data)
         word_file.save(os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', 'namsel-ocr.docx'))
@@ -1155,68 +1156,68 @@ class NamselOcr(QMainWindow):
 
     def pechabook(self, e):
         if e:
-            if not self.pdouble_page.isChecked() and not self.adouble_page.isChecked():
-                self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
+            if not self.p_doublepage_checkbox.isChecked() and not self.a_option_double_page_check.isChecked():
+                self.p_staklayout.setCurrentWidget(self.p_h_widget)
 
-                if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                    self.azone_layer1_staklayout.setCurrentWidget(self.azone_layer1_place)
+                if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
+                    self.a_result_stacklayout1.setCurrentWidget(self.a_result_auto_widget1)
                 else:
-                    self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
-                self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
+                    self.a_result_stacklayout1.setCurrentWidget(self.a_result_manual_widget1)
+                self.a_staklayout.setCurrentWidget(self.a_h_widget)
 
-            if self.petat == "Result" and self.pdouble_page.isChecked():
-                self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
+            if self.petat == "Result" and self.p_doublepage_checkbox.isChecked():
+                self.p_staklayout.setCurrentWidget(self.p_v_widget)
             else:
-                self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_hwidget)
+                self.o_staklayout.setCurrentWidget(self.o_h_widget)
 
-            self.pd_widget.show()
-            self.od_widget.show()
-            self.adc_widget.show()
-            self.pbook_button.setChecked(True)
-            self.obook_button.setChecked(True)
-            self.abook_button.setChecked(True)
+            self.p_doublepage_widget.show()
+            self.o_clearhr_widget.show()
+            self.a_option_double_page_clearhr_widget.show()
+            self.p_book_button.setChecked(True)
+            self.o_book_button.setChecked(True)
+            self.a_option_book_button.setChecked(True)
         else:
-            self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
-            self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
+            self.p_staklayout.setCurrentWidget(self.p_v_widget)
+            self.o_staklayout.setCurrentWidget(self.o_v_widget)
 
-            if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                self.azone_layer2_staklayout.setCurrentWidget(self.azone_layer2_place)
+            if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
+                self.a_result_stacklayout2.setCurrentWidget(self.a_result_auto_widget2)
             else:
-                self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
-            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
+                self.a_result_stacklayout2.setCurrentWidget(self.a_result_manual_widget2)
+            self.a_staklayout.setCurrentWidget(self.a_v_widget)
 
-            self.pd_widget.hide()
-            self.od_widget.hide()
-            self.adc_widget.hide()
-            self.ppecha_button.setChecked(True)
-            self.opecha_button.setChecked(True)
-            self.apecha_button.setChecked(True)
+            self.p_doublepage_widget.hide()
+            self.o_clearhr_widget.hide()
+            self.a_option_double_page_clearhr_widget.hide()
+            self.p_pecha_button.setChecked(True)
+            self.o_pecha_button.setChecked(True)
+            self.a_option_pecha_button.setChecked(True)
 
     def double(self, e):
         if e:
-            self.pimage_staklayout.setCurrentWidget(self.pimage_vwidget)
-            self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_vwidget)
+            self.p_staklayout.setCurrentWidget(self.p_v_widget)
+            self.o_staklayout.setCurrentWidget(self.o_v_widget)
 
-            if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                self.azone_layer2_staklayout.setCurrentWidget(self.azone_layer2_place)
+            if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
+                self.a_result_stacklayout2.setCurrentWidget(self.a_result_auto_widget2)
             else:
-                self.azone_layer2_staklayout.setCurrentWidget(self.atext_tool_alayer2)
-            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_avwidget)
+                self.a_result_stacklayout2.setCurrentWidget(self.a_result_manual_widget2)
+            self.a_staklayout.setCurrentWidget(self.a_v_widget)
 
-            self.pdouble_page.setChecked(True)
-            self.adouble_page.setChecked(True)
+            self.p_doublepage_checkbox.setChecked(True)
+            self.a_option_double_page_check.setChecked(True)
         else:
-            self.pimage_staklayout.setCurrentWidget(self.pimage_hwidget)
-            self.oimagetext_staklayout.setCurrentWidget(self.oimagetext_hwidget)
+            self.p_staklayout.setCurrentWidget(self.p_h_widget)
+            self.o_staklayout.setCurrentWidget(self.o_h_widget)
 
-            if self.aswitch_layer.currentWidget() == self.amanual_place1:
-                self.azone_layer1_staklayout.setCurrentWidget(self.azone_layer1_place)
+            if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
+                self.a_result_stacklayout1.setCurrentWidget(self.a_result_auto_widget1)
             else:
-                self.azone_layer1_staklayout.setCurrentWidget(self.atext_tool_alayer1)
-            self.aimagetext_staklayout.setCurrentWidget(self.aimagetext_ahwidget)
+                self.a_result_stacklayout1.setCurrentWidget(self.a_result_manual_widget1)
+            self.a_staklayout.setCurrentWidget(self.a_h_widget)
 
-            self.pdouble_page.setChecked(False)
-            self.adouble_page.setChecked(False)
+            self.p_doublepage_checkbox.setChecked(False)
+            self.a_option_double_page_check.setChecked(False)
 
     def openScanImage(self, folder=""):
         if self.petat == "Scan":
@@ -1231,35 +1232,35 @@ class NamselOcr(QMainWindow):
             self.dialog_etat = True
 
             if self.petat == "Result":
-                self.presult_image_layer1.clear()
-                self.presult_image_layer2.clear()
+                self.p_result_image_label1.clear()
+                self.p_result_image_label2.clear()
                 self.del_out_dir()
 
             if self.oetat == "Ocr":
-                self.otext_layer1.hide()
-                self.otext_layer2.hide()
-                self.otext_layer1.clear()
-                self.otext_layer2.clear()
-                self.atext_tool_alayer1.hide()
-                self.atext_tool_alayer2.hide()
-                self.atext_left_layer1.clear()
-                self.atext_right_layer1.clear()
-                self.atext_up_layer2.clear()
-                self.atext_down_layer2.clear()
-                self.azone_layer1_place.hide()
-                self.azone_layer2_place.hide()
-                self.atext_alayer1.clear()
-                self.atext_alayer2.clear()
+                self.o_textedit1.hide()
+                self.o_textedit2.hide()
+                self.o_textedit1.clear()
+                self.o_textedit2.clear()
+                self.a_result_manual_widget1.hide()
+                self.a_result_manual_widget2.hide()
+                self.a_result_text_left_textedit.clear()
+                self.a_result_text_right_textedit.clear()
+                self.a_result_text_up_textedit.clear()
+                self.a_result_text_down_textedit.clear()
+                self.a_result_auto_widget1.hide()
+                self.a_result_auto_widget2.hide()
+                self.a_result_text_manual_textedit1.clear()
+                self.a_result_text_manual_textedit2.clear()
                 self.del_out_dir()
                 self.del_files()
 
             self.psimage = QPixmap(self.scan_image_name)
-            self.pscan_image_layer1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-            self.pscan_image_layer2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-            self.oscan_image_layer1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-            self.oscan_image_layer2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-            self.ascan_image_layer1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-            self.ascan_image_layer2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.p_scan_image_label1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.p_scan_image_label2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.o_scan_image_label1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.o_scan_image_label2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.a_scan_image_label1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+            self.a_scan_image_label2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
 
             self.petat = "Scan"
 
@@ -1301,11 +1302,11 @@ class NamselOcr(QMainWindow):
                             ack = copy(os.path.join(self.scan_folder_name, f), work_directory)
                             if ack.find(f): break
 
-            if self.pslider.value():
-                self.arg["threshold"] = self.pslider.value()
+            if self.p_slider.value():
+                self.arg["threshold"] = self.p_slider.value()
             else:
                 self.arg["threshold"] = 0
-            if self.pdouble_page.isChecked():
+            if self.p_doublepage_checkbox.isChecked():
                 self.arg["layout"] = "double"
 
             docker.etat = "Preprocess"
@@ -1328,12 +1329,12 @@ class NamselOcr(QMainWindow):
             if self.petat == "Scan":
                 copy(self.scan_image_name, work_directory)
 
-            if self.obook_button.isChecked():
+            if self.o_book_button.isChecked():
                 self.arg["page_type"] = "book"
                 self.arg["line_break_method"] = "line_cut"
-                if self.oclearhr.isChecked(): self.arg["clear_hr"] = True
-            if self.olowink.isChecked(): self.arg["low_ink"] = True
-            if self.odial.value(): self.arg["break_width"] = self.odial.value()/2
+                if self.o_clearhr_checkbox.isChecked(): self.arg["clear_hr"] = True
+            if self.o_lowink_checkbox.isChecked(): self.arg["low_ink"] = True
+            if self.o_dial.value(): self.arg["break_width"] = self.o_dial.value() / 2
 
             docker.etat = "Ocr"
             docker.ocr(self.arg)
@@ -1344,86 +1345,86 @@ class NamselOcr(QMainWindow):
             self.openScanImage()
 
         if self.dialog_etat and self.aetat != "Result":
-            if self.aswitch_layer.currentWidget() == self.amanual_place1:
+            if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
                 if len(self.athreshold) == 1:
-                    if self.achoice_m40.isChecked():
+                    if self.a_option_auto_choice_m40_check.isChecked():
                         self.athreshold.append(-40)
-                        self.atool_text_left_files_m40_layer1.show()
-                        self.atool_text_right_files_m40_layer1.show()
-                        self.atool_text_up_files_m40_layer2.show()
-                        self.atool_text_down_files_m40_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_m40_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_m40_layer2
+                        self.a_result_auto_tool_left_m40_radio.show()
+                        self.a_result_auto_tool_right_m40_radio.show()
+                        self.a_result_auto_tool_up_m40_radio.show()
+                        self.a_result_auto_tool_down_m40_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_m40_radio
+                        self.atext2_down = self.a_result_auto_tool_down_m40_radio
 
-                    if self.achoice_m30.isChecked():
+                    if self.a_option_auto_choice_m30_check.isChecked():
                         self.athreshold.append(-30)
-                        self.atool_text_left_files_m30_layer1.show()
-                        self.atool_text_right_files_m30_layer1.show()
-                        self.atool_text_up_files_m30_layer2.show()
-                        self.atool_text_down_files_m30_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_m30_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_m30_layer2
+                        self.a_result_auto_tool_left_m30_radio.show()
+                        self.a_result_auto_tool_right_m30_radio.show()
+                        self.a_result_auto_tool_up_m30_radio.show()
+                        self.a_result_auto_tool_down_m30_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_m30_radio
+                        self.atext2_down = self.a_result_auto_tool_down_m30_radio
 
-                    if self.achoice_m20.isChecked():
+                    if self.a_option_auto_choice_m20_check.isChecked():
                         self.athreshold.append(-20)
-                        self.atool_text_left_files_m20_layer1.show()
-                        self.atool_text_right_files_m20_layer1.show()
-                        self.atool_text_up_files_m20_layer2.show()
-                        self.atool_text_down_files_m20_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_m20_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_m20_layer2
+                        self.a_result_auto_tool_left_m20_radio.show()
+                        self.a_result_auto_tool_right_m20_radio.show()
+                        self.a_result_auto_tool_up_m20_radio.show()
+                        self.a_result_auto_tool_down_m20_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_m20_radio
+                        self.atext2_down = self.a_result_auto_tool_down_m20_radio
 
-                    if self.achoice_m10.isChecked():
+                    if self.a_option_auto_choice_m10_check.isChecked():
                         self.athreshold.append(-10)
-                        self.atool_text_left_files_m10_layer1.show()
-                        self.atool_text_right_files_m10_layer1.show()
-                        self.atool_text_up_files_m10_layer2.show()
-                        self.atool_text_down_files_m10_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_m10_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_m10_layer2
+                        self.a_result_auto_tool_left_m10_radio.show()
+                        self.a_result_auto_tool_right_m10_radio.show()
+                        self.a_result_auto_tool_up_m10_radio.show()
+                        self.a_result_auto_tool_down_m10_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_m10_radio
+                        self.atext2_down = self.a_result_auto_tool_down_m10_radio
 
-                    if self.achoice_p10.isChecked():
+                    if self.a_option_auto_choice_p10_check.isChecked():
                         self.athreshold.append(10)
-                        self.atool_text_left_files_p10_layer1.show()
-                        self.atool_text_right_files_p10_layer1.show()
-                        self.atool_text_up_files_p10_layer2.show()
-                        self.atool_text_down_files_p10_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_p10_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_p10_layer2
+                        self.a_result_auto_tool_left_p10_radio.show()
+                        self.a_result_auto_tool_right_p10_radio.show()
+                        self.a_result_auto_tool_up_p10_radio.show()
+                        self.a_result_auto_tool_down_p10_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_p10_radio
+                        self.atext2_down = self.a_result_auto_tool_down_p10_radio
 
-                    if self.achoice_p20.isChecked():
+                    if self.a_option_auto_choice_p20_check.isChecked():
                         self.athreshold.append(20)
-                        self.atool_text_left_files_p20_layer1.show()
-                        self.atool_text_right_files_p20_layer1.show()
-                        self.atool_text_up_files_p20_layer2.show()
-                        self.atool_text_down_files_p20_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_p20_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_p20_layer2
+                        self.a_result_auto_tool_left_p20_radio.show()
+                        self.a_result_auto_tool_right_p20_radio.show()
+                        self.a_result_auto_tool_up_p20_radio.show()
+                        self.a_result_auto_tool_down_p20_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_p20_radio
+                        self.atext2_down = self.a_result_auto_tool_down_p20_radio
 
-                    if self.achoice_p30.isChecked():
+                    if self.a_option_auto_choice_p30_check.isChecked():
                         self.athreshold.append(30)
-                        self.atool_text_left_files_p30_layer1.show()
-                        self.atool_text_right_files_p30_layer1.show()
-                        self.atool_text_up_files_p30_layer2.show()
-                        self.atool_text_down_files_p30_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_p30_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_p30_layer2
+                        self.a_result_auto_tool_left_p30_radio.show()
+                        self.a_result_auto_tool_right_p30_radio.show()
+                        self.a_result_auto_tool_up_p30_radio.show()
+                        self.a_result_auto_tool_down_p30_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_p30_radio
+                        self.atext2_down = self.a_result_auto_tool_down_p30_radio
 
-                    if self.achoice_p40.isChecked():
+                    if self.a_option_auto_choice_p40_check.isChecked():
                         self.athreshold.append(40)
-                        self.atool_text_left_files_p40_layer1.show()
-                        self.atool_text_right_files_p40_layer1.show()
-                        self.atool_text_up_files_p40_layer2.show()
-                        self.atool_text_down_files_p40_layer2.show()
-                        self.atext2_right_layer1 = self.atool_text_right_files_p40_layer1
-                        self.atext2_down_layer2 = self.atool_text_down_files_p40_layer2
+                        self.a_result_auto_tool_left_p40_radio.show()
+                        self.a_result_auto_tool_right_p40_radio.show()
+                        self.a_result_auto_tool_up_p40_radio.show()
+                        self.a_result_auto_tool_down_p40_radio.show()
+                        self.atext2_right = self.a_result_auto_tool_right_p40_radio
+                        self.atext2_down = self.a_result_auto_tool_down_p40_radio
 
                 if self.petat == "Scan":
                     self.scan_image_name_temp = QFileInfo(self.scan_image_name).fileName()
                     self.scan_image_filename = str(self.athreshold[self.aloop]) + "_" + self.scan_image_name_temp
                     copy(self.scan_image_name, os.path.join(work_directory, self.scan_image_filename))
 
-                    if self.adouble_page.isChecked(): self.arg["layout"] = "double"
+                    if self.a_option_double_page_check.isChecked(): self.arg["layout"] = "double"
                     self.arg["threshold"] = self.athreshold[self.aloop]
 
                     self.aetat = "Scan"
@@ -1454,11 +1455,11 @@ class NamselOcr(QMainWindow):
                                     ack = copy(os.path.join(self.scan_folder_name, f), work_directory)
                                     if ack.find(f): break
 
-                    if self.aslider.value():
-                        self.arg["threshold"] = self.aslider.value()
+                    if self.a_option_manual_slider.value():
+                        self.arg["threshold"] = self.a_option_manual_slider.value()
                     else:
                         self.arg["threshold"] = 0
-                    if self.adouble_page.isChecked():
+                    if self.a_option_double_page_check.isChecked():
                         self.arg["layout"] = "double"
 
                     self.aetat = "Scan"
@@ -1475,12 +1476,12 @@ class NamselOcr(QMainWindow):
                     self.wait(txt)
 
         elif self.aetat == "Result":
-            if self.abook_button.isChecked():
+            if self.a_option_book_button.isChecked():
                 self.arg["page_type"] = "book"
                 self.arg["line_break_method"] = "line_cut"
-                if self.aclearhr.isChecked(): self.arg["clear_hr"] = True
-            if self.alowink.isChecked(): self.arg["low_ink"] = True
-            if self.adial.value(): self.arg["break_width"] = self.adial.value() / 2
+                if self.a_option_clearhr_check.isChecked(): self.arg["clear_hr"] = True
+            if self.a_option_lowink_check.isChecked(): self.arg["low_ink"] = True
+            if self.a_option_dial.value(): self.arg["break_width"] = self.a_option_dial.value() / 2
 
             docker.etat = "AutoOcr"
             docker.ocr(self.arg)
@@ -1505,30 +1506,30 @@ class NamselOcr(QMainWindow):
         if docker.etat == "Preprocess":
             if os.path.isdir(os.path.join(work_directory, "out")) and os.path.isfile(os.path.join(work_directory, "out", self.scan_image_filename)):
                 self.primage = QPixmap(os.path.join(".", "out", self.scan_image_filename))
-                self.presult_image_layer1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-                self.presult_image_layer2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-                self.oscan_image_layer1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-                self.oscan_image_layer2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+                self.p_result_image_label1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+                self.p_result_image_label2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+                self.o_scan_image_label1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
+                self.o_scan_image_label2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
                 self.del_files()
 
                 self.petat = "Result"
 
                 if self.oetat == "Ocr":
-                    self.otext_layer1.hide()
-                    self.otext_layer2.hide()
-                    self.otext_layer1.clear()
-                    self.otext_layer2.clear()
+                    self.o_textedit1.hide()
+                    self.o_textedit2.hide()
+                    self.o_textedit1.clear()
+                    self.o_textedit2.clear()
                     self.oetat = ""
 
                 if self.aetat == "Ocr":
-                    self.azone_layer1_place.hide()
-                    self.azone_layer2_place.hide()
-                    self.atext_alayer1.clear()
-                    self.atext_alayer2.clear()
+                    self.a_result_auto_widget1.hide()
+                    self.a_result_auto_widget2.hide()
+                    self.a_result_text_manual_textedit1.clear()
+                    self.a_result_text_manual_textedit2.clear()
                     self.aetat = ""
 
-                self.ascan_image_layer1.clear()
-                self.ascan_image_layer2.clear()
+                self.a_scan_image_label1.clear()
+                self.a_scan_image_label2.clear()
 
         elif docker.etat == "Ocr":
             self.copyFile2Qtext()
@@ -1545,7 +1546,7 @@ class NamselOcr(QMainWindow):
             return
 
         elif docker.etat == "AutoOcr":
-            if self.aswitch_layer.currentWidget() == self.amanual_place1:
+            if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
                 self.copyOutput()
 
                 if self.aloop == len(self.athreshold)-1:
@@ -1572,14 +1573,14 @@ class NamselOcr(QMainWindow):
     def copyFile2Qtext(self):
         with open("ocr_output.txt", "r", encoding="utf-8") as file:
             data = file.read()
-        self.otext_layer1.setText(data)
-        self.otext_layer2.setText(data)
-        self.otext_layer1.show()
-        self.otext_layer2.show()
-        self.atext_alayer1.setText(data)
-        self.atext_alayer2.setText(data)
-        self.atext_tool_alayer1.show()
-        self.atext_tool_alayer2.show()
+        self.o_textedit1.setText(data)
+        self.o_textedit2.setText(data)
+        self.o_textedit1.show()
+        self.o_textedit2.show()
+        self.a_result_text_manual_textedit1.setText(data)
+        self.a_result_text_manual_textedit2.setText(data)
+        self.a_result_manual_widget1.show()
+        self.a_result_manual_widget2.show()
 
     def copyOutput(self):
         copy("ocr_output.txt", str(self.arg["threshold"]) + "_ocr_output.txt")
@@ -1588,21 +1589,21 @@ class NamselOcr(QMainWindow):
     def copyFile2QtextAuto(self):
         with open("0_ocr_output.txt", "r", encoding="utf-8") as file:
             data = file.read()
-        self.atext_left_layer1.setText(data)
-        self.atext_up_layer2.setText(data)
-        self.atool_text_left_files_0_layer1.setChecked(True)
-        self.atool_text_up_files_0_layer2.setChecked(True)
+        self.a_result_text_left_textedit.setText(data)
+        self.a_result_text_up_textedit.setText(data)
+        self.a_result_auto_tool_left_0_radio.setChecked(True)
+        self.a_result_auto_tool_up_0_radio.setChecked(True)
 
         if len(self.athreshold) > 1:
             with open(str(self.arg["threshold"]) + "_ocr_output.txt", "r", encoding="utf-8") as file:
                 data = file.read()
-            self.atext_right_layer1.setText(data)
-            self.atext_down_layer2.setText(data)
-            self.atext2_right_layer1.setChecked(True)
-            self.atext2_down_layer2.setChecked(True)
+            self.a_result_text_right_textedit.setText(data)
+            self.a_result_text_down_textedit.setText(data)
+            self.atext2_right.setChecked(True)
+            self.atext2_down.setChecked(True)
 
-        self.azone_layer1_place.show()
-        self.azone_layer2_place.show()
+        self.a_result_auto_widget1.show()
+        self.a_result_auto_widget2.show()
 
     def lang(self, e):
         global lang
