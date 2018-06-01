@@ -313,16 +313,16 @@ class NamselOcr(QMainWindow):
         self.a_option_manual_slider_group.setLayout(self.a_option_manual_slider_layout)
 
                                 # Switch Buttons
-        self.a_option_auto_toauto_button = QPushButton(lang.gettext("Auto"))
-        self.a_option_auto_toauto_button.setStatusTip(lang.gettext("Switch to Auto settings"))
-        self.a_option_auto_toauto_button.setFixedWidth(100)
+        self.a_option_manual_toauto_button = QPushButton(lang.gettext("Auto"))
+        self.a_option_manual_toauto_button.setStatusTip(lang.gettext("Switch to Auto settings"))
+        self.a_option_manual_toauto_button.setFixedWidth(100)
 
                             # All together
         self.a_option_manual_slider_toauto_layout = QVBoxLayout()
         self.a_option_manual_slider_toauto_widget = QWidget()
         
         self.a_option_manual_slider_toauto_layout.addWidget(self.a_option_manual_slider_group)
-        self.a_option_manual_slider_toauto_layout.addWidget(self.a_option_auto_toauto_button, 0, Qt.AlignCenter)
+        self.a_option_manual_slider_toauto_layout.addWidget(self.a_option_manual_toauto_button, 0, Qt.AlignCenter)
         self.a_option_manual_slider_toauto_layout.setContentsMargins(0, 0, 0, 0)
         self.a_option_manual_slider_toauto_widget.setLayout(self.a_option_manual_slider_toauto_layout)
 
@@ -1031,7 +1031,7 @@ class NamselOcr(QMainWindow):
         self.auto_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.autopage_widget))
         self.a_option_manual_slider.valueChanged.connect(self.a_option_manual_sliderlcd.display)
         self.a_option_auto_tomanual_button.released.connect(self.autoManual)
-        self.a_option_auto_toauto_button.released.connect(self.autoAuto)
+        self.a_option_manual_toauto_button.released.connect(self.autoAuto)
         self.a_option_dial.valueChanged.connect(lambda x: self.a_option_diallcd.display(x / 2) if x else self.a_option_diallcd.display("Off"))
         self.a_option_book_button.toggled.connect(self.pechabook)
         self.a_option_double_page_check.toggled.connect(self.double)
@@ -1219,22 +1219,31 @@ class NamselOcr(QMainWindow):
             self.p_doublepage_checkbox.setChecked(False)
             self.a_option_double_page_check.setChecked(False)
 
-    def openScanImage(self, folder=""):
+    def openScanImage(self, folder="", multi=True):
         if self.petat == "Scan":
             self.scan_image_name_temp = self.scan_image_name
 
         self.dialog_etat = False
         if not folder: folder = "/"
 
-        self.scan_image_name, _ = QFileDialog.getOpenFileName(self, lang.gettext("Open the source scan image..."),\
+        if multi:
+            self.scan_image_name, _ = QFileDialog.getOpenFileNames(self, lang.gettext("Open the source scan image..."),\
                                                               folder, lang.gettext("Image files (*.tif)"))
+        else:
+            self.scan_image_name, _ = QFileDialog.getOpenFileName(self, lang.gettext("Open the source scan image..."), \
+                                                                   folder, lang.gettext("Image files (*.tif)"))
         if self.scan_image_name:
+            if multi:
+                self.scan_image_name1 = self.scan_image_name[0]
+            else:
+                self.scan_image_name1 = self.scan_image_name
+
             self.dialog_etat = True
 
             if self.petat == "Result":
                 self.p_result_image_label1.clear()
                 self.p_result_image_label2.clear()
-                self.del_out_dir()
+                self.delOutDir()
 
             if self.oetat == "Ocr":
                 self.o_textedit1.hide()
@@ -1251,10 +1260,10 @@ class NamselOcr(QMainWindow):
                 self.a_result_auto_widget2.hide()
                 self.a_result_text_manual_textedit1.clear()
                 self.a_result_text_manual_textedit2.clear()
-                self.del_out_dir()
-                self.del_files()
+                self.delOutDir()
+                self.delFiles()
 
-            self.psimage = QPixmap(self.scan_image_name)
+            self.psimage = QPixmap(self.scan_image_name1)
             self.p_scan_image_label1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
             self.p_scan_image_label2.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
             self.o_scan_image_label1.setPixmap(self.psimage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
@@ -1283,18 +1292,9 @@ class NamselOcr(QMainWindow):
             self.openScanImage()
 
         if self.petat == "Scan":
-            if self.pvolume:
-                answer = QMessageBox.question(self,
-                            lang.gettext("Message"), lang.gettext("Preprocess all the volume images?"),
-                                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-                if answer == QMessageBox.Yes:
-                    pass
-                elif answer == QMessageBox.No:
-                    self.pvolume = False
-                else: return
-
             if self.pvolume == False:
-                copy(self.scan_image_name, work_directory)
+                for f in self.scan_image_name:
+                    copy(f, work_directory)
             else:
                 for f in os.listdir(self.scan_folder_name):
                     if f.endswith(".tif"):
@@ -1312,11 +1312,14 @@ class NamselOcr(QMainWindow):
             docker.etat = "Preprocess"
             docker.preprocess(self.arg)
 
-            self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
+            self.scan_image_filename = QFileInfo(self.scan_image_name[0]).fileName()
+            nb_files = len(self.scan_image_name)
 
             if self.pvolume:
                 txt = self.scan_folder_name + "\n\n" + "Thickness: " + str(self.arg["threshold"])
                 self.pvolume = False
+            elif nb_files > 1:
+                txt = str(nb_files) + " image files\n\n" + "Thickness: " + str(self.arg["threshold"])
             else:
                 txt = self.scan_image_filename + "\n\n" + "Thickness: " + str(self.arg["threshold"])
             self.wait(txt)
@@ -1327,7 +1330,8 @@ class NamselOcr(QMainWindow):
 
         if self.dialog_etat:
             if self.petat == "Scan":
-                copy(self.scan_image_name, work_directory)
+                for f in self.scan_image_name:
+                    copy(f, work_directory)
 
             if self.o_book_button.isChecked():
                 self.arg["page_type"] = "book"
@@ -1341,11 +1345,11 @@ class NamselOcr(QMainWindow):
             self.wait()
 
     def autoRun(self):
-        if self.aetat == "Ocr" or self.aetat == "" and self.petat != "Scan":
-            self.openScanImage()
+        if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
+            if self.aetat == "Ocr" or (self.aetat == "" and self.petat != "Scan"):
+                self.openScanImage(multi=False)
 
-        if self.dialog_etat and self.aetat != "Result":
-            if self.a_option_manual_auto_switch_layout.currentWidget() == self.a_option_auto_choice_tomanual_widget:
+            if self.dialog_etat and self.aetat != "Result":
                 if len(self.athreshold) == 1:
                     if self.a_option_auto_choice_m40_check.isChecked():
                         self.athreshold.append(-40)
@@ -1419,6 +1423,11 @@ class NamselOcr(QMainWindow):
                         self.atext2_right = self.a_result_auto_tool_right_p40_radio
                         self.atext2_down = self.a_result_auto_tool_down_p40_radio
 
+                    if len(self.athreshold) == 1:
+                        self.a_option_manual_auto_switch_layout.setCurrentWidget(self.a_option_manual_slider_toauto_widget)
+                        self.autoRun()
+                        return
+
                 if self.petat == "Scan":
                     self.scan_image_name_temp = QFileInfo(self.scan_image_name).fileName()
                     self.scan_image_filename = str(self.athreshold[self.aloop]) + "_" + self.scan_image_name_temp
@@ -1432,22 +1441,15 @@ class NamselOcr(QMainWindow):
                     docker.etat = "AutoPreprocess"
                     docker.preprocess(self.arg)
                     self.wait(self.scan_image_name_temp + "\n\n" + "Thickness: " + str(self.arg["threshold"]))
-            else:
-                if self.petat == "Scan":
-                    if self.pvolume:
-                        answer = QMessageBox.question(self,
-                                                      lang.gettext("Message"),
-                                                      lang.gettext("Preprocess all the volume images?"),
-                                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-                        if answer == QMessageBox.Yes:
-                            pass
-                        elif answer == QMessageBox.No:
-                            self.pvolume = False
-                        else:
-                            return
+        else:
+            if self.aetat == "Ocr" or (self.aetat == "" and self.petat != "Scan"):
+                self.openScanImage()
 
+            if self.dialog_etat and self.aetat != "Result":
+                if self.petat == "Scan":
                     if self.pvolume == False:
-                        copy(self.scan_image_name, work_directory)
+                        for f in self.scan_image_name:
+                            copy(f, work_directory)
                     else:
                         for f in os.listdir(self.scan_folder_name):
                             if f.endswith(".tif"):
@@ -1466,16 +1468,20 @@ class NamselOcr(QMainWindow):
 
                     docker.etat = "AutoPreprocess"
                     docker.preprocess(self.arg)
-                    self.scan_image_filename = QFileInfo(self.scan_image_name).fileName()
+
+                    self.scan_image_filename = QFileInfo(self.scan_image_name[0]).fileName()
+                    nb_files = len(self.scan_image_name)
 
                     if self.pvolume:
                         txt = self.scan_folder_name + "\n\n" + "Thickness: " + str(self.arg["threshold"])
                         self.pvolume = False
+                    elif nb_files > 1:
+                        txt = str(nb_files) + " image files\n\n" + "Thickness: " + str(self.arg["threshold"])
                     else:
                         txt = self.scan_image_filename + "\n\n" + "Thickness: " + str(self.arg["threshold"])
                     self.wait(txt)
 
-        elif self.aetat == "Result":
+        if self.aetat == "Result":
             if self.a_option_book_button.isChecked():
                 self.arg["page_type"] = "book"
                 self.arg["line_break_method"] = "line_cut"
@@ -1510,7 +1516,7 @@ class NamselOcr(QMainWindow):
                 self.p_result_image_label2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
                 self.o_scan_image_label1.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
                 self.o_scan_image_label2.setPixmap(self.primage.scaled(self.x_wsize, self.y_wsize, Qt.KeepAspectRatio))
-                self.del_files()
+                self.delFiles()
 
                 self.petat = "Result"
 
@@ -1584,7 +1590,7 @@ class NamselOcr(QMainWindow):
 
     def copyOutput(self):
         copy("ocr_output.txt", str(self.arg["threshold"]) + "_ocr_output.txt")
-        self.del_out_dir()
+        self.delOutDir()
 
     def copyFile2QtextAuto(self):
         with open("0_ocr_output.txt", "r", encoding="utf-8") as file:
@@ -1615,16 +1621,16 @@ class NamselOcr(QMainWindow):
             qApp.exit(2)
 
     def restart(self):
-        self.del_files()
-        self.del_out_dir()
+        self.delFiles()
+        self.delOutDir()
         qApp.exit(1)
 
-    def del_files(self):
+    def delFiles(self):
         for f in os.listdir(work_directory):
             if not os.path.isdir(f):
                 os.remove(f)
 
-    def del_out_dir(self):
+    def delOutDir(self):
         if os.path.isdir(os.path.join(work_directory, "out")):
             rmtree(os.path.join(work_directory, "out"))
 
