@@ -1,20 +1,16 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
 import sys
 import os
 from tempfile import gettempdir
 from shutil import copy, rmtree
-
 import gettext
-
-from re import sub
-import docx
+from re import findall, sub
+from bs4 import BeautifulSoup
 
 # Sharing folders with PyInstaller
 def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
@@ -75,7 +71,6 @@ class Docker(object):
     def exec(self, text="", param="", arg={}):
         arg = " " + " ".join(["--" + k + " " + str(v) for k, v in arg.items() if v])
         print(lang.gettext("\n" + text))
-        #print(arg)
         self.docker_process.start("docker exec namsel-ocr ./namsel-ocr " + param + arg)
 
     def stop(self):
@@ -155,7 +150,7 @@ class NamselOcr(QMainWindow):
         self.mode_subactiongroup.addAction(self.auto_subaction)
         self.mode_subactiongroup.addAction(self.prep_subaction)
         self.mode_subactiongroup.addAction(self.ocr_subaction)
-        self.prep_subaction.setChecked(True)
+        self.auto_subaction.setChecked(True)
         self.option_menu.addActions(self.mode_subactiongroup.actions())
         self.option_menu.addSeparator()
                 # Language
@@ -320,7 +315,7 @@ class NamselOcr(QMainWindow):
                             # All together
         self.a_option_manual_slider_toauto_layout = QVBoxLayout()
         self.a_option_manual_slider_toauto_widget = QWidget()
-        
+
         self.a_option_manual_slider_toauto_layout.addWidget(self.a_option_manual_slider_group)
         self.a_option_manual_slider_toauto_layout.addWidget(self.a_option_manual_toauto_button, 0, Qt.AlignCenter)
         self.a_option_manual_slider_toauto_layout.setContentsMargins(0, 0, 0, 0)
@@ -626,15 +621,11 @@ class NamselOcr(QMainWindow):
         self.a_result_tool_manual_clean_button1 = QPushButton(lang.gettext("Clean"))
         self.a_result_tool_manual_clean_button1.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
         self.a_result_tool_manual_clean_button1.setFixedWidth(100)
-        self.a_result_tool_manual_docx_button1 = QPushButton(lang.gettext("(.docx)"))
-        self.a_result_tool_manual_docx_button1.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
-        self.a_result_tool_manual_docx_button1.setFixedWidth(100)
 
         self.a_result_tool_manual_group_layout1 = QHBoxLayout()
         self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_copy_button1)
         self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_clean_button1)
         self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_paste_button1)
-        self.a_result_tool_manual_group_layout1.addWidget(self.a_result_tool_manual_docx_button1)
         self.a_result_tool_manual_group1 = QGroupBox()
         self.a_result_tool_manual_group1.setLayout(self.a_result_tool_manual_group_layout1)
 
@@ -642,7 +633,8 @@ class NamselOcr(QMainWindow):
         self.a_result_text_manual_textedit1 = QTextEdit()
         self.a_result_text_manual_textedit1.setStatusTip(lang.gettext("The ocr result"))
         self.a_result_text_manual_textedit1.setFont(self.font)
-        self.a_result_text_manual_textedit1.setFontPointSize(18)
+        self.a_result_text_manual_textedit1.setFontPointSize(22)
+        self.a_result_text_manual_textedit1.setAcceptRichText(True)
 
                                 # Put together
         self.a_result_manual_layout1 = QVBoxLayout()
@@ -663,15 +655,11 @@ class NamselOcr(QMainWindow):
         self.a_result_tool_manual_clean_button2 = QPushButton(lang.gettext("Clean"))
         self.a_result_tool_manual_clean_button2.setStatusTip(lang.gettext("Create a finished and cleaned version of the document"))
         self.a_result_tool_manual_clean_button2.setFixedWidth(100)
-        self.a_result_tool_manual_docx_button2 = QPushButton(lang.gettext("(.docx)"))
-        self.a_result_tool_manual_docx_button2.setStatusTip(lang.gettext("Create a Word document (.docx) on the Desktop"))
-        self.a_result_tool_manual_docx_button2.setFixedWidth(100)
 
         self.a_result_tool_manual_group_layout2 = QHBoxLayout()
         self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_copy_button2)
         self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_clean_button2)
         self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_paste_button2)
-        self.a_result_tool_manual_group_layout2.addWidget(self.a_result_tool_manual_docx_button2)
         self.a_result_tool_manual_group2 = QGroupBox()
         self.a_result_tool_manual_group2.setLayout(self.a_result_tool_manual_group_layout2)
 
@@ -679,7 +667,8 @@ class NamselOcr(QMainWindow):
         self.a_result_text_manual_textedit2 = QTextEdit()
         self.a_result_text_manual_textedit2.setStatusTip(lang.gettext("The ocr result"))
         self.a_result_text_manual_textedit2.setFont(self.font)
-        self.a_result_text_manual_textedit2.setFontPointSize(18)
+        self.a_result_text_manual_textedit2.setFontPointSize(22)
+        self.a_result_text_manual_textedit2.setAcceptRichText(True)
 
                                 # Put together
         self.a_result_manual_layout2 = QVBoxLayout()
@@ -708,7 +697,7 @@ class NamselOcr(QMainWindow):
         self.a_result_stacklayout2.addWidget(self.a_result_manual_widget2)
         self.a_result_stacklayout2.setCurrentWidget(self.a_result_manual_widget2)
 
-        self.a_result_widget2.setLayout(self.a_result_stacklayout1)
+        self.a_result_widget2.setLayout(self.a_result_stacklayout2)
         self.a_result_manual_widget2.hide()
         self.a_result_auto_widget2.hide()
 
@@ -963,8 +952,8 @@ class NamselOcr(QMainWindow):
         self.o_textedit2.setStatusTip(lang.gettext("The ocr result"))
         self.o_textedit1.setFont(self.font)
         self.o_textedit2.setFont(self.font)
-        self.o_textedit1.setFontPointSize(18)
-        self.o_textedit2.setFontPointSize(18)
+        self.o_textedit1.setFontPointSize(22)
+        self.o_textedit2.setFontPointSize(22)
         self.o_textedit1.hide()
         self.o_textedit2.hide()
 
@@ -1006,7 +995,7 @@ class NamselOcr(QMainWindow):
         self.page_staklayout.addWidget(self.autopage_widget)
         self.page_staklayout.addWidget(self.prep_widget)
         self.page_staklayout.addWidget(self.ocr_widget)
-        self.page_staklayout.setCurrentWidget(self.prep_widget)
+        self.page_staklayout.setCurrentWidget(self.autopage_widget)
 
         # Showing the default page on screen
         self.setCentralWidget(self.page_widget)
@@ -1083,8 +1072,6 @@ class NamselOcr(QMainWindow):
         self.a_result_tool_manual_clean_button2.released.connect(self.clean)
         self.a_result_tool_manual_paste_button1.released.connect(self.paste)
         self.a_result_tool_manual_paste_button2.released.connect(self.paste)
-        self.a_result_tool_manual_docx_button1.released.connect(self.docx)
-        self.a_result_tool_manual_docx_button2.released.connect(self.docx)
 
             # Preprocess mode
         self.prep_subaction.triggered.connect(lambda: self.page_staklayout.setCurrentWidget(self.prep_widget))
@@ -1118,34 +1105,85 @@ class NamselOcr(QMainWindow):
             self.a_result_auto_widget1.hide()
             self.a_result_auto_widget2.hide()
 
+        self.open_dir_subaction.setDisabled(True)
+
     def copy(self):
-        data = self.a_result_text_manual_textedit1.toPlainText()
-        QApplication.clipboard().setText(data)
+        self.a_result_text_manual_textedit1.selectAll()
+        self.a_result_text_manual_textedit1.copy()
+
+        c = self.a_result_text_manual_textedit1.textCursor()
+        c.movePosition(QTextCursor.Start)
+        self.a_result_text_manual_textedit1.setTextCursor(c)
+
 
     def clean(self):
-        data = self.a_result_text_manual_textedit1.toPlainText()
-        data = sub(r"(OCR text\n)|(\n.*?.tif\n)|(་)\n", r"\3", data)
-        data = sub(r"([ག།])\n", r"\1 ", data)
-        data = sub(r"\n\n", "", data)
-        data = sub(r"(༄|.༅)", r"\n\1", data)
-        self.o_textedit1.setText(data)
-        self.o_textedit2.setText(data)
-        self.a_result_text_manual_textedit1.setText(data)
-        self.a_result_text_manual_textedit2.setText(data)
+        data = self.a_result_text_manual_textedit1.toHtml()
+        nb = findall(r"font-size:([0-9]+)pt", data)
+        ws = []
+        for i, n in enumerate(nb):
+            if n != "22" and n != "18":
+                ws.append(n)
+
+        for w in ws:
+            if int(w) > 20:
+                data = data.replace("font-size:" + w, "font-size:22")
+            else:
+                data = data.replace("font-size:" + w, "font-size:18")
+
+        data = data.replace("> <", "><")
+        data = data.replace("> <", "><")
+        soup = BeautifulSoup(data, 'html.parser')
+
+        for br in soup.findAll('br'):
+            br.extract()
+
+        lines = soup.find_all('p')
+        for l in lines:
+            if l.text == "OCR text" or "tif" in l.text:
+                l.extract()
+            elif str(l.text).endswith("།") or str(l.text).endswith("ག"):
+                end_space_tag = soup.new_tag("span")
+                end_space_tag.string = " "
+                l.contents[-1].string.insert_after(end_space_tag)
+
+            if str(l.text).startswith("༄") or "༅" in l.text:
+                l.contents[0].string = sub(r"^(༄|(.༅)).*? །", r"", l.contents[0].string)
+
+                start_color_tag = soup.new_tag("span")
+                start_color_tag['style'] = 'color:red'
+                start_color_tag.string = "༄༅། །"
+                l.contents[0].string.insert_before(start_color_tag)
+                l.insert(0, soup.new_tag('br'))
+
+        for p in soup.findAll('p'):
+            p.unwrap()
+
+        data = str(soup).replace(">\n<", "><")
+
+        self.o_textedit1.setHtml(str(soup))
+        self.o_textedit2.setHtml(str(soup))
+        self.a_result_text_manual_textedit1.setHtml(data)
+        self.a_result_text_manual_textedit2.setHtml(str(soup))
+
+        self.a_result_tool_manual_clean_button1.setEnabled(False)
+        self.a_result_tool_manual_clean_button2.setEnabled(False)
 
     def paste(self):
-        data = QApplication.clipboard().text()
-        self.o_textedit1.setText(data)
-        self.o_textedit2.setText(data)
-        self.a_result_text_manual_textedit1.setText(data)
-        self.a_result_text_manual_textedit2.setText(data)
+        self.a_result_text_manual_textedit1.selectAll()
+        self.o_textedit1.paste()
+        self.o_textedit2.paste()
+        self.a_result_text_manual_textedit1.paste()
+        self.a_result_text_manual_textedit2.paste()
 
-    def docx(self):
-        data = self.a_result_text_manual_textedit1.toPlainText()
-        word_file = docx.Document()
-        word_file.add_paragraph(data)
-        word_file.save(os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', 'namsel-ocr.docx'))
-        del word_file
+        c1 = self.a_result_text_manual_textedit1.textCursor()
+        c2 = self.a_result_text_manual_textedit2.textCursor()
+        c1.movePosition(QTextCursor.Start)
+        c2.movePosition(QTextCursor.Start)
+        self.a_result_text_manual_textedit1.setTextCursor(c1)
+        self.a_result_text_manual_textedit2.setTextCursor(c2)
+
+        self.a_result_tool_manual_clean_button1.setEnabled(True)
+        self.a_result_tool_manual_clean_button2.setEnabled(True)
 
     def comparison(self, pos, button, e):
         if e:
@@ -1224,14 +1262,22 @@ class NamselOcr(QMainWindow):
             self.scan_image_name_temp = self.scan_image_name
 
         self.dialog_etat = False
-        if not folder: folder = "/"
 
-        if multi:
-            self.scan_image_name, _ = QFileDialog.getOpenFileNames(self, lang.gettext("Open the source scan image..."),\
-                                                              folder, lang.gettext("Image files (*.tif)"))
+        if not folder:
+            if multi:
+                self.scan_image_name, _ = QFileDialog.getOpenFileNames(self, lang.gettext("Open the source scan image..."),
+                                                                       "/", lang.gettext("Image files (*.tif)"))
+            else:
+                self.scan_image_name, _ = QFileDialog.getOpenFileName(self, lang.gettext("Open the source scan image..."),
+                                                                      "/", lang.gettext("Image files (*.tif)"))
         else:
-            self.scan_image_name, _ = QFileDialog.getOpenFileName(self, lang.gettext("Open the source scan image..."), \
-                                                                   folder, lang.gettext("Image files (*.tif)"))
+            for file in os.listdir(folder):
+                if file.endswith(".tif"):
+                    self.scan_image_name = os.path.join(folder, file)
+                    break
+            else:
+                self.scan_image_name = ""
+
         if self.scan_image_name:
             if multi:
                 self.scan_image_name1 = self.scan_image_name[0]
@@ -1283,7 +1329,7 @@ class NamselOcr(QMainWindow):
             "Open a directory containing the scan images of a volume..."), "")
         if self.scan_folder_name:
             self.pvolume = True
-            self.openScanImage(self.scan_folder_name)
+            self.openScanImage(self.scan_folder_name, multi=False)
         elif self.pvolume:
             self.scan_folder_name = self.scan_folder_name_temp
 
